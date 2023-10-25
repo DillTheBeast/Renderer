@@ -1,32 +1,12 @@
-import turtle
+from PIL import Image, ImageDraw
 
-screen = turtle.Screen()
-t = turtle.Turtle()
-t.speed(100)
+# Create a blank white image
+img = Image.new('RGB', (800, 600), color='white')
 
-t.hideturtle()
-t.penup()  # Lift the pen
-t.goto(300, 300)  # Move to the desired position
-t.pendown()  # Put the pen down
+# Use the ImageDraw module to fill the image
+draw = ImageDraw.Draw(img)
+for x in range(-200, 200):
+    for y in range(-200, 200):
+        draw.point((x + 400, y + 300), fill='red')  # Adjusting for center
 
-# Draw a dot
-dot_size = 5  # Adjust the size of the dot as needed
-t.dot(dot_size)
-
-
-t.goto(-300, 300)  # Move to the desired position
-
-# Draw a dot
-dot_size = 5  # Adjust the size of the dot as needed
-t.dot(dot_size)
-
-t.goto(0, 0)
-
-# Draw a dot
-dot_size = 5  # Adjust the size of the dot as needed
-t.dot(dot_size)
-
-t.goto(300, 300)
-
-# Keep the window open until it's closed by the user
-turtle.done()
+img.show()
