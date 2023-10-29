@@ -19,6 +19,28 @@ angle = 0
 
 points = []
 
+h = 2  # assuming the height of the prism is 2 units for this example
+
+hexPrismPoints = []
+# Top hexagon
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
+hexPrismPoints.append(np.matrix([0, 1, h/2]))
+hexPrismPoints.append(np.matrix([0, -1, h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
+
+# Bottom hexagon
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
+hexPrismPoints.append(np.matrix([0, 1, -h/2]))
+hexPrismPoints.append(np.matrix([0, -1, -h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+
+for i in range(0, len(hexPrismPoints)):
+    points.append(hexPrismPoints[i])
+
 #For Cube
 # points.append(np.matrix([-1, -1, 1]))
 # points.append(np.matrix([1, -1, 1]))
@@ -43,7 +65,6 @@ points = []
 # points.append(np.matrix([0, 1, 0]))     # Apex
 
 
-points.append(np.matrix([0, 1, 0]))     # Apex
 
 
 
@@ -172,6 +193,37 @@ while True:
         # for p in range(4):
         #     connectPoints(p, (p+1) % 4, projectedPoints)
         #     connectPoints(p, 4, projectedPoints)
+
+        # Top hexagon
+        # connectPoints(0, 1, projectedPoints)
+        # connectPoints(0, 2, projectedPoints)
+        # connectPoints(1, 3, projectedPoints)
+        # connectPoints(2, 4, projectedPoints)
+        # connectPoints(3, 5, projectedPoints)
+        # connectPoints(4, 5, projectedPoints)
+
+        # Bottom hexagon
+        connectPoints(6, 7, projectedPoints)
+        connectPoints(6, 8, projectedPoints)
+        connectPoints(7, 9, projectedPoints)
+        connectPoints(8, 10, projectedPoints)
+        connectPoints(9, 11, projectedPoints)
+        connectPoints(10, 11, projectedPoints)
+        
+
+        # Vertical connections
+        connectPoints(0, 6, projectedPoints)
+        connectPoints(1, 7, projectedPoints)
+        connectPoints(2, 8, projectedPoints)
+        connectPoints(3, 9, projectedPoints)
+        connectPoints(4, 10, projectedPoints)
+        connectPoints(5, 11, projectedPoints)
+
+        for p in hexPrismPoints:
+            print(p)
+
+
+
 
 
     pygame.display.update()
