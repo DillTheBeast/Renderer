@@ -7,6 +7,10 @@ forward = False
 triangle = False
 pyramid = False
 cube = True
+moveUp = False
+moveDown = False
+moveLeft = False
+moveRight = False
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -134,7 +138,21 @@ while True:
                     pyramid = False
                 elif cube:
                     cube = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Check if left mouse button is clicked
+                x, y = pygame.mouse.get_pos()
+                circle_pos = [x,y]
 
+    #Doing these keys pressed this way so it also works for holding    
+    keys = pygame.key.get_pressed()  # get the state of all the keys
+    if keys[pygame.K_w]:
+        circle_pos[1] -= 5
+    if keys[pygame.K_s]:
+        circle_pos[1] += 5
+    if keys[pygame.K_d]:
+        circle_pos[0] += 5
+    if keys[pygame.K_a]:
+        circle_pos[0] -= 5
     if not paused:
         # update stuff
         rotationZ = np.matrix([
