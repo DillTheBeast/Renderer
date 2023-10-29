@@ -219,8 +219,12 @@ while True:
         connectPoints(4, 10, projectedPoints)
         connectPoints(5, 11, projectedPoints)
 
-        for p in hexPrismPoints:
-            print(p)
+        lst = [0, 0, 1, 2, 3, 4]
+        for i in range(len(lst) - 1):
+            for j in range(i+1, len(lst)):
+                if j - i <= 2 and (lst[i], lst[j]) not in [(0, 0), (1, 2), (2, 3), (3, 4)]:
+                    connectPoints(i, j, projectedPoints)
+
 
 
 
