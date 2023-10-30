@@ -1,6 +1,9 @@
 import pygame
 import numpy as np
 from math import *
+import sys
+
+pygame.init()
 
 paused = False
 forward = False
@@ -13,9 +16,46 @@ moveDown = False
 moveLeft = False
 moveRight = False
 
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
-BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+
+#Button Colors
+buttonText = (255, 87, 51)
+buttonShell = (255, 255, 237)
+colorLight = (170,170,170)  
+colorDark = (100,100,100)
+
+# defining a font
+smallfont = pygame.font.SysFont('Corbel', 35)
+#Rendering headers + button texts
+texts = []
+header1 = smallfont.render('Background Color' , True , buttonText)
+texts.append(header1)
+color1 = smallfont.render('Black', True, buttonText)
+texts.append(color1)
+color2 = smallfont.render('White', True, buttonText)
+texts.append(color2)
+color3 = smallfont.render('Blue', True, buttonText)
+texts.append(color3)
+color4 = smallfont.render('Red', True, buttonText)
+texts.append(color4)
+color5 = smallfont.render('Green', True, buttonText)
+texts.append(color5)
+color6 = smallfont.render('Grey', True, buttonText)
+texts.append(color6)
+color7 = smallfont.render('Pink', True, buttonText)
+texts.append(color7)
+color8 = smallfont.render('Cyan', True, buttonText)
+texts.append(color8)
+color9 = smallfont.render('Orange', True, buttonText)
+texts.append(color9)
+color10 = smallfont.render('Purple', True, buttonText)
+texts.append(color10)
+header2 = smallfont.render('Shape Color' , True , buttonText)
+
 
 WIDTH, HEIGHT = 1440, 845
 pygame.display.set_caption("3d Renderer")
@@ -229,5 +269,11 @@ while True:
             movement(pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
         elif hexPrism:
             movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True)
-
+    place = 20
+    for i in range(2):
+        for j in range(len(texts)):
+            screen.blit(texts[j], (20, place))
+            place += 35
+        place += 40
+        texts[0] = header2
     pygame.display.update()
