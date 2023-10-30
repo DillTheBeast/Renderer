@@ -91,7 +91,7 @@ hexPrismProjectedPoints = [
 
 
 def connectPoints(i, j, points):
-    pygame.draw.line(screen, BLACK, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
+    pygame.draw.line(screen, RED, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
 def check(object1, object2, object3):
     if object1:
@@ -119,7 +119,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         print("length of projectedPoints:", len(projectedPoints))
 
         projectedPoints[i] = [x, y]
-        pygame.draw.circle(screen, BLACK, (x, y), 5)
+        pygame.draw.circle(screen, RED, (x, y), 5)
         i += 1
     #Connecting the points
     if cube:
@@ -217,7 +217,7 @@ while True:
         else:
             angle -= 0.01
 
-        screen.fill(WHITE)
+        screen.fill(BLACK)
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
