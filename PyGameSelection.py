@@ -182,7 +182,8 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 x, y = pygame.mouse.get_pos()
-                circle_pos = [x,y]
+                if x > 100:
+                    circle_pos = [x,y]
 
     #Doing these keys pressed this way so it also works for holding    
     keys = pygame.key.get_pressed()  # get the state of all the keys
