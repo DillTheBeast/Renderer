@@ -103,7 +103,8 @@ def check(object1, object2, object3):
 
     return object1, object2, object3
 
-def thing(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
+def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
+    #Making dots at updated/rotated points
     for point in points:
         rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
         rotated2D = np.dot(rotationX, rotated2D)
@@ -120,6 +121,7 @@ def thing(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         projectedPoints[i] = [x, y]
         pygame.draw.circle(screen, BLACK, (x, y), 5)
         i += 1
+    #Connecting the points
     if cube:
         for p in range(4):
             connectPoints(p, (p + 1) % 4, projectedPoints)
@@ -149,6 +151,7 @@ while True:
 
     clock.tick(60)
     for event in pygame.event.get():
+        #Checking what key is pressed and then executing specific action
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
@@ -156,9 +159,9 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
-            if event.key == pygame.K_SPACE:  # Check if the key pressed is space
+            if event.key == pygame.K_SPACE:
                 paused = not paused
-            if event.key == pygame.K_r:  # Check if the key pressed is space
+            if event.key == pygame.K_r: 
                 forward = not forward
             if event.key == pygame.K_UP:
                 scale += 96
@@ -192,7 +195,7 @@ while True:
     if keys[pygame.K_a]:
         circle_pos[0] -= 5
     if not paused:
-        # update stuff
+        # update shape rotations
         rotationZ = np.matrix([
             [cos(angle), -sin(angle), 0],
             [sin(angle), cos(angle), 0],
@@ -215,15 +218,15 @@ while True:
             angle -= 0.01
 
         screen.fill(WHITE)
-        # drawing stuff
+        #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
-            thing(cubePoints, cubeProjectedPoints, i, True, False, False, False)
+            movement(cubePoints, cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
-            thing(trianglePoints, triangleProjectedPoints, i, False, True, False, False)
+            movement(trianglePoints, triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
-            thing(pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
+            movement(pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
         elif hexPrism:
-            thing(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True)
+            movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True)
 
     pygame.display.update()
