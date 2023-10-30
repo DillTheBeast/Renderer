@@ -7,6 +7,7 @@ forward = False
 triangle = False
 pyramid = False
 cube = True
+hexPrism = False
 moveUp = False
 moveDown = False
 moveLeft = False
@@ -27,6 +28,7 @@ angle = 0
 cubePoints = []
 trianglePoints = []
 pyramidPoints = []
+hexPrismPoints = []
 
 # For Cube
 cubePoints.append(np.matrix([-1, -1, 1]))
@@ -51,6 +53,24 @@ pyramidPoints.append(np.matrix([1, -1, -1]))  # Base Point 3
 pyramidPoints.append(np.matrix([-1, -1, -1]))  # Base Point 4
 pyramidPoints.append(np.matrix([0, 1, 0]))  # Apex
 
+#For Hexagon Prism
+h = 2  # assuming the height of the prism is 2 units
+# Top hexagon
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
+hexPrismPoints.append(np.matrix([0, 1, h/2]))
+hexPrismPoints.append(np.matrix([0, -1, h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
+
+# Bottom hexagon
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
+hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
+hexPrismPoints.append(np.matrix([0, 1, -h/2]))
+hexPrismPoints.append(np.matrix([0, -1, -h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
+hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+
 projection_matrix = np.matrix([
     [1, 0, 0],
     [0, 1, 0]
@@ -65,13 +85,25 @@ triangleProjectedPoints = [
 pyramidProjectedPoints = [
     [n, n] for n in range(len(pyramidPoints))
 ]
+hexPrismProjectedPoints = [
+    [n, n] for n in range(len(pyramidPoints))
+]
 
 
 def connectPoints(i, j, points):
     pygame.draw.line(screen, BLACK, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
+def check(object1, object2, object3):
+    if object1:
+        object1 = not object1
+    if object2: 
+        object2 = not object2
+    if object3:
+        object3 = not object3
 
-def thing(points, projectedPoints, i, cube, triangle, pyramid):
+    return object1, object2, object3
+
+def thing(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
     for point in points:
         rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
         rotated2D = np.dot(rotationX, rotated2D)
@@ -81,6 +113,9 @@ def thing(points, projectedPoints, i, cube, triangle, pyramid):
 
         x = int(projected2D[0, 0] * scale) + circle_pos[0]
         y = int(projected2D[1, 0] * scale) + circle_pos[1]
+
+        print("i:", i)
+        print("length of projectedPoints:", len(projectedPoints))
 
         projectedPoints[i] = [x, y]
         pygame.draw.circle(screen, BLACK, (x, y), 5)
@@ -98,6 +133,15 @@ def thing(points, projectedPoints, i, cube, triangle, pyramid):
         for p in range(4):
             connectPoints(p, (p + 1) % 4, projectedPoints)
             connectPoints(p, 4, projectedPoints)
+    elif hexPrism:
+        # for p in range(0, 11):
+        #     if p != 5 and p != 10 and p != 4:
+        #         connectPoints(p, p + 2, projectedPoints)
+        #     if p == 6 or p == 0 or p == 10 or p == 4:
+        #         connectPoints(p, p + 1, projectedPoints)
+        #     if p < 6:
+        #         connectPoints(p, p + 6, projectedPoints)
+        print("Test")
 
 clock = pygame.time.Clock()
 
@@ -122,22 +166,16 @@ while True:
                 scale -= 96
             if event.key == pygame.K_c:
                 cube = not cube
-                if pyramid:
-                    pyramid = False
-                elif triangle:
-                    triangle = False
+                pyramid, triangle, hexPrism = check(pyramid, triangle, hexPrism)
             if event.key == pygame.K_p:
                 pyramid = not pyramid
-                if cube:
-                    cube = False
-                elif triangle:
-                    triangle = False
+                cube, triangle, hexPrism = check(cube, triangle, hexPrism)
             if event.key == pygame.K_t:
                 triangle = not triangle
-                if pyramid:
-                    pyramid = False
-                elif cube:
-                    cube = False
+                pyramid, cube, hexPrism = check(pyramid, cube, hexPrism)
+            if event.key == pygame.K_h:
+                hexPrism = not hexPrism
+                pyramid, cube, triangle = check(pyramid, cube, triangle)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 x, y = pygame.mouse.get_pos()
@@ -180,10 +218,12 @@ while True:
         # drawing stuff
         i = 0
         if cube:
-            thing(cubePoints, cubeProjectedPoints, i, True, False, False)
+            thing(cubePoints, cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
-            thing(trianglePoints, triangleProjectedPoints, i, False, True, False)
+            thing(trianglePoints, triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
-            thing(pyramidPoints, pyramidProjectedPoints, i, False, False, True)
+            thing(pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
+        elif hexPrism:
+            thing(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True)
 
     pygame.display.update()

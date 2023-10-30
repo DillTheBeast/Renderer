@@ -194,7 +194,7 @@ while True:
         #     connectPoints(p, (p+1) % 4, projectedPoints)
         #     connectPoints(p, 4, projectedPoints)
 
-        # Top hexagon
+        #Top hexagon
         # connectPoints(0, 1, projectedPoints)
         # connectPoints(0, 2, projectedPoints)
         # connectPoints(1, 3, projectedPoints)
@@ -203,28 +203,37 @@ while True:
         # connectPoints(4, 5, projectedPoints)
 
         # Bottom hexagon
-        connectPoints(6, 7, projectedPoints)
-        connectPoints(6, 8, projectedPoints)
-        connectPoints(7, 9, projectedPoints)
-        connectPoints(8, 10, projectedPoints)
-        connectPoints(9, 11, projectedPoints)
-        connectPoints(10, 11, projectedPoints)
-        
+        # connectPoints(6, 7, projectedPoints)
+        # connectPoints(6, 8, projectedPoints)
+        # connectPoints(7, 9, projectedPoints)
+        # connectPoints(8, 10, projectedPoints)
+        # connectPoints(9, 11, projectedPoints)
+        # connectPoints(10, 11, projectedPoints)
 
         # Vertical connections
-        connectPoints(0, 6, projectedPoints)
-        connectPoints(1, 7, projectedPoints)
-        connectPoints(2, 8, projectedPoints)
-        connectPoints(3, 9, projectedPoints)
-        connectPoints(4, 10, projectedPoints)
-        connectPoints(5, 11, projectedPoints)
+        # connectPoints(0, 6, projectedPoints)
+        # connectPoints(1, 7, projectedPoints)
+        # connectPoints(2, 8, projectedPoints)
+        # connectPoints(3, 9, projectedPoints)
+        # connectPoints(4, 10, projectedPoints)
+        # connectPoints(5, 11, projectedPoints)
 
-        lst = [0, 0, 1, 2, 3, 4]
-        for i in range(len(lst) - 1):
-            for j in range(i+1, len(lst)):
-                if j - i <= 2 and (lst[i], lst[j]) not in [(0, 0), (1, 2), (2, 3), (3, 4)]:
-                    connectPoints(i, j, projectedPoints)
 
+        # lst = [0, 0, 1, 2, 3, 4]
+        # for i in range(len(lst) - 1):
+        #     for j in range(i+1, len(lst)):
+        #         if j - i <= 2 and (lst[i], lst[j]) not in [(0, 0), (1, 2), (2, 3), (3, 4)]:
+        #             connectPoints(i, j, projectedPoints)
+
+        for i in range(0, 11):
+            if i != 5 and i != 10 and i != 4:
+                connectPoints(i, i + 2, projectedPoints)
+            if i == 6 or i == 0 or i == 10 or i == 4:
+                connectPoints(i, i + 1, projectedPoints)
+            if i < 6:
+                connectPoints(i, i + 6, projectedPoints)
+
+                
 
 
 
