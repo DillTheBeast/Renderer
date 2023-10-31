@@ -98,15 +98,6 @@ projection_matrix = np.matrix([
     [0, 1, 0]
 ])
 
-cubeProjectedPoints = [
-    [n, n] for n in range(len(Cube.cubePoints))
-]
-triangleProjectedPoints = [
-    [n, n] for n in range(len(Triangle.trianglePoints))
-]
-pyramidProjectedPoints = [
-    [n, n] for n in range(len(Pyramid.pyramidPoints))
-]
 # hexPrismProjectedPoints = [
 #     [n, n] for n in range(len(hexPrism.hexPrismPoints))
 # ]
@@ -304,7 +295,7 @@ while True:
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
-            movement(Cube.cubePoints, cubeProjectedPoints, i, True, False, False, False)
+            movement(Cube.cubePoints, Cube.cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
             movement(Triangle.trianglePoints, triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:

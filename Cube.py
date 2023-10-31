@@ -3,6 +3,9 @@ import numpy as np
 class Cube:
     def __init__(self):
         self.cubePoints = []
+        self.cubeProjectedPoints = [
+            [n, n] for n in range(len(self.cubePoints))
+        ]
 
     def appendCubePoints(self):
         self.cubePoints.append(np.array([-1, -1, 1]))

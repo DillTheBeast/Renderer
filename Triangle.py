@@ -3,6 +3,9 @@ import numpy as np
 class Triangle:
     def __init__(self):
         self.trianglePoints = []
+        self.triangleProjectedPoints = [
+            [n, n] for n in range(len(self.trianglePoints))
+        ]
 
     def appendTrianglePoints(self):
         self.trianglePoints.append(np.matrix([-1, -1, 1]))  # Base Point 1

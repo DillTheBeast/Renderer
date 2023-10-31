@@ -3,6 +3,9 @@ import numpy as np
 class Pyramid:
     def __init__(self):
         self.pyramidPoints = []
+        pyramidProjectedPoints = [
+            [n, n] for n in range(len(self.pyramidPoints))
+        ]
 
     def appendPyramidPoints(self):
         self.pyramidPoints.append(np.matrix([-1, -1, 1]))  # Base Point 1
