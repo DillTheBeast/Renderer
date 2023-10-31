@@ -18,28 +18,41 @@ circle_pos = [WIDTH/2, HEIGHT/2]
 angle = 0
 
 points = []
+radius = 1
+resolution = 20
+num_points = 1000
+theta_values = np.linspace(0, np.pi, resolution)
+phi_values = np.linspace(0, 2*np.pi, 2*resolution)
 
-h = 2  # assuming the height of the prism is 2 units for this example
+for theta in theta_values:
+    for phi in phi_values:
+        x = radius * np.sin(theta) * np.cos(phi)
+        y = radius * np.sin(theta) * np.sin(phi)
+        z = radius * np.cos(theta)
+        points.append(np.matrix([x, y, z]))
 
-hexPrismPoints = []
-# Top hexagon
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
-hexPrismPoints.append(np.matrix([0, 1, h/2]))
-hexPrismPoints.append(np.matrix([0, -1, h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
+# h = 2  # assuming the height of the prism is 2 units for this example
 
-# Bottom hexagon
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
-hexPrismPoints.append(np.matrix([0, 1, -h/2]))
-hexPrismPoints.append(np.matrix([0, -1, -h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+# hexPrismPoints = []
+# # Top hexagon
+# hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
+# hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
+# hexPrismPoints.append(np.matrix([0, 1, h/2]))
+# hexPrismPoints.append(np.matrix([0, -1, h/2]))
+# hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
+# hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
 
-for i in range(0, len(hexPrismPoints)):
-    points.append(hexPrismPoints[i])
+# # Bottom hexagon
+# hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
+# hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
+# hexPrismPoints.append(np.matrix([0, 1, -h/2]))
+# hexPrismPoints.append(np.matrix([0, -1, -h/2]))
+# hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
+# hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+
+# for i in range(0, len(hexPrismPoints)):
+#     points.append(hexPrismPoints[i])
+
 
 #For Cube
 # points.append(np.matrix([-1, -1, 1]))
@@ -130,9 +143,15 @@ while True:
         #drawing stuff
         i = 0
         for point in points:
-            rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
+            # rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
+            # rotated2D = np.dot(rotationX, rotated2D)
+            # rotated2D = np.dot(rotationY, rotated2D)
+
+            point_np = np.array(point).reshape((3, 1))
+            rotated2D = np.dot(rotationZ, point_np)
             rotated2D = np.dot(rotationX, rotated2D)
             rotated2D = np.dot(rotationY, rotated2D)
+
 
             projected2D = np.dot(projection_matrix, rotated2D)
 
@@ -225,17 +244,43 @@ while True:
         #         if j - i <= 2 and (lst[i], lst[j]) not in [(0, 0), (1, 2), (2, 3), (3, 4)]:
         #             connectPoints(i, j, projectedPoints)
 
-        for i in range(0, 11):
-            if i != 5 and i != 10 and i != 4:
-                connectPoints(i, i + 2, projectedPoints)
-            if i == 6 or i == 0 or i == 10 or i == 4:
-                connectPoints(i, i + 1, projectedPoints)
-            if i < 6:
-                connectPoints(i, i + 6, projectedPoints)
+        # for i in range(0, 11):
+        #     if i != 5 and i != 10 and i != 4:
+        #         connectPoints(i, i + 2, projectedPoints)
+        #     if i == 6 or i == 0 or i == 10 or i == 4:
+        #         connectPoints(i, i + 1, projectedPoints)
+        #     if i < 6:
+        #         connectPoints(i, i + 6, projectedPoints)
 
-                
+        # # Top face connections
+        # connectPoints(0, 1, projectedPoints)
+        # connectPoints(1, 3, projectedPoints)
+        # connectPoints(3, 5, projectedPoints)
+        # connectPoints(5, 7, projectedPoints)
+        # connectPoints(7, 6, projectedPoints)
+        # connectPoints(6, 4, projectedPoints)
+        # connectPoints(4, 2, projectedPoints)
+        # connectPoints(2, 0, projectedPoints)
 
+        # # Bottom face connections
+        # connectPoints(8, 9, projectedPoints)
+        # connectPoints(9, 11, projectedPoints)
+        # connectPoints(11, 13, projectedPoints)
+        # connectPoints(13, 15, projectedPoints)
+        # connectPoints(15, 14, projectedPoints)
+        # connectPoints(14, 12, projectedPoints)
+        # connectPoints(12, 10, projectedPoints)
+        # connectPoints(10, 8, projectedPoints)
 
+        # # Side connections
+        # connectPoints(0, 8, projectedPoints)
+        # connectPoints(1, 9, projectedPoints)
+        # connectPoints(2, 10, projectedPoints)
+        # connectPoints(3, 11, projectedPoints)
+        # connectPoints(4, 12, projectedPoints)
+        # connectPoints(5, 13, projectedPoints)
+        # connectPoints(6, 14, projectedPoints)
+        # connectPoints(7, 15, projectedPoints)
 
 
 
