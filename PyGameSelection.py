@@ -2,6 +2,11 @@ import pygame
 import numpy as np
 from math import *
 import sys
+from Cube import Cube
+from Triangle import Triangle
+from Pyramid import Pyramid
+from Sphere import Sphere
+from HexPrism import hexPrism
 
 pygame.init()
 
@@ -11,6 +16,7 @@ triangle = False
 pyramid = False
 cube = True
 hexPrism = False
+sphere = False
 moveUp = False
 moveDown = False
 moveLeft = False
@@ -71,51 +77,21 @@ scale = 96
 circle_pos = [WIDTH / 2, HEIGHT / 2]
 angle = 0
 
-cubePoints = []
-trianglePoints = []
-pyramidPoints = []
-hexPrismPoints = []
-
 # For Cube
-cubePoints.append(np.matrix([-1, -1, 1]))
-cubePoints.append(np.matrix([1, -1, 1]))
-cubePoints.append(np.matrix([1, 1, 1]))
-cubePoints.append(np.matrix([-1, 1, 1]))
-cubePoints.append(np.matrix([-1, -1, -1]))
-cubePoints.append(np.matrix([1, -1, -1]))
-cubePoints.append(np.matrix([1, 1, -1]))
-cubePoints.append(np.matrix([-1, 1, -1]))
+cube = Cube()
+cube.appendCubePoints()
 
 # For Triangle
-trianglePoints.append(np.matrix([-1, -1, 1]))  # Base Point 1
-trianglePoints.append(np.matrix([1, -1, 1]))  # Base Point 2
-trianglePoints.append(np.matrix([0, -1, -1]))  # Base Point 3
-trianglePoints.append(np.matrix([0, 1, 0]))  # Apex
+triangle = Triangle()
+triangle.appendTrianglePoints()
 
 # For Pyramid
-pyramidPoints.append(np.matrix([-1, -1, 1]))  # Base Point 1
-pyramidPoints.append(np.matrix([1, -1, 1]))  # Base Point 2
-pyramidPoints.append(np.matrix([1, -1, -1]))  # Base Point 3
-pyramidPoints.append(np.matrix([-1, -1, -1]))  # Base Point 4
-pyramidPoints.append(np.matrix([0, 1, 0]))  # Apex
+pyramid = Pyramid()
+pyramid.appendPyramidPoints()
 
 #For Hexagon Prism
-h = 2  # assuming the height of the prism is 2 units
-# Top hexagon
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
-hexPrismPoints.append(np.matrix([0, 1, h/2]))
-hexPrismPoints.append(np.matrix([0, -1, h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
-
-# Bottom hexagon
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
-hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
-hexPrismPoints.append(np.matrix([0, 1, -h/2]))
-hexPrismPoints.append(np.matrix([0, -1, -h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
-hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+# hexPrism = hexPrism()
+# hexPrism.appendHexPrismPoints()
 
 projection_matrix = np.matrix([
     [1, 0, 0],
@@ -123,16 +99,16 @@ projection_matrix = np.matrix([
 ])
 
 cubeProjectedPoints = [
-    [n, n] for n in range(len(cubePoints))
+    [n, n] for n in range(len(cube.cubePoints))
 ]
 triangleProjectedPoints = [
-    [n, n] for n in range(len(trianglePoints))
+    [n, n] for n in range(len(Triangle.trianglePoints))
 ]
 pyramidProjectedPoints = [
-    [n, n] for n in range(len(pyramidPoints))
+    [n, n] for n in range(len(Pyramid.pyramidPoints))
 ]
 hexPrismProjectedPoints = [
-    [n, n] for n in range(len(hexPrismPoints))
+    [n, n] for n in range(len(hexPrism.hexPrismPoints))
 ]
 
 
@@ -169,10 +145,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         i += 1
     #Connecting the points
     if cube:
-        for p in range(4):
-            connectPoints(p, (p + 1) % 4, projectedPoints)
-            connectPoints(p + 4, ((p + 1) % 4) + 4, projectedPoints)
-            connectPoints(p, p + 4, projectedPoints)
+        cube.connectCubePoints(connectPoints, projected2D)
     elif triangle:
         for p in range(3):
             connectPoints(p, (p + 1) % 3, projectedPoints)
@@ -331,7 +304,7 @@ while True:
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
-            movement(cubePoints, cubeProjectedPoints, i, True, False, False, False)
+            movement(cube.cubePoints, cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
             movement(trianglePoints, triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
