@@ -125,7 +125,7 @@ def check(object1, object2, object3):
 
     return object1, object2, object3
 
-def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, Cube):
+def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
     #Making dots at updated/rotated points
     for point in points:
         rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
@@ -304,11 +304,11 @@ while True:
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
-            movement(Cube.cubePoints, cubeProjectedPoints, i, True, False, False, False, Cube)
+            movement(Cube.cubePoints, cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
-            movement(triangle.trianglePoints, triangleProjectedPoints, i, False, True, False, False, Cube)
+            movement(Triangle.trianglePoints, triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
-            movement(pyramid.pyramidPoints, pyramidProjectedPoints, i, False, False, True, False, Cube)
+            movement(Pyramid.pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
         #elif hexPrism:
             #movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True, Cube)
     place = 20
