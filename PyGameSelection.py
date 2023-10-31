@@ -297,9 +297,9 @@ while True:
         if cube:
             movement(Cube.cubePoints, Cube.cubeProjectedPoints, i, True, False, False, False)
         elif triangle:
-            movement(Triangle.trianglePoints, triangleProjectedPoints, i, False, True, False, False)
+            movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
-            movement(Pyramid.pyramidPoints, pyramidProjectedPoints, i, False, False, True, False)
+            movement(Pyramid.pyramidPoints, Triangle.pyramidProjectedPoints, i, False, False, True, False)
         #elif hexPrism:
             #movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True, Cube)
     place = 20
