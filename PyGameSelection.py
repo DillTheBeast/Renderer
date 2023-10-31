@@ -6,7 +6,7 @@ from Cube import Cube
 from Triangle import Triangle
 from Pyramid import Pyramid
 from Sphere import Sphere
-from HexPrism import hexPrism
+from HexPrism import HexPrism
 
 pygame.init()
 
@@ -90,18 +90,13 @@ Pyramid = Pyramid()
 Pyramid.appendPyramidPoints()
 
 #For Hexagon Prism
-# hexPrism = hexPrism()
-# hexPrism.appendHexPrismPoints()
+HexPrism = HexPrism()
+HexPrism.appendHexPrismPoints()
 
 projection_matrix = np.matrix([
     [1, 0, 0],
     [0, 1, 0]
 ])
-
-# hexPrismProjectedPoints = [
-#     [n, n] for n in range(len(hexPrism.hexPrismPoints))
-# ]
-
 
 def connectPoints(i, j, points):
     pygame.draw.line(screen, shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
@@ -299,8 +294,8 @@ while True:
             movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
             movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, i, False, False, True, False)
-        #elif hexPrism:
-            #movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True, Cube)
+        elif hexPrism:
+            movement(HexPrism.HexPrismPoints, HexPrism.HexPrismProjectedPoints, i, False, False, False, True)
     place = 20
     for i in range(2):
         for j in range(len(texts)):

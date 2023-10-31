@@ -1,26 +1,29 @@
 import numpy as np
 
-class hexPrism:
+class HexPrism:
     def __init__(self):
-        self.hexPrismPoints = []
+        self.HexPrismPoints = []
+        self.HexPrismProjectedPoints = [
+            [n, n] for n in range(len(self.HexPrismPoints))
+        ]
 
     def appendHexPrismPoints(self):
         h = 2  # assuming the height of the prism is 2 units
         # Top hexagon
-        self.hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
-        self.hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
-        self.hexPrismPoints.append(np.matrix([0, 1, h/2]))
-        self.hexPrismPoints.append(np.matrix([0, -1, h/2]))
-        self.hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
-        self.hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
+        self.HexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, h/2]))
+        self.HexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, h/2]))
+        self.HexPrismPoints.append(np.matrix([0, 1, h/2]))
+        self.HexPrismPoints.append(np.matrix([0, -1, h/2]))
+        self.HexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, h/2]))
+        self.HexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, h/2]))
 
         # Bottom hexagon
-        self.hexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
-        self.hexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
-        self.hexPrismPoints.append(np.matrix([0, 1, -h/2]))
-        self.hexPrismPoints.append(np.matrix([0, -1, -h/2]))
-        self.hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
-        self.hexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
+        self.HexPrismPoints.append(np.matrix([np.sqrt(3)/2, 0.5, -h/2]))
+        self.HexPrismPoints.append(np.matrix([np.sqrt(3)/2, -0.5, -h/2]))
+        self.HexPrismPoints.append(np.matrix([0, 1, -h/2]))
+        self.HexPrismPoints.append(np.matrix([0, -1, -h/2]))
+        self.HexPrismPoints.append(np.matrix([-np.sqrt(3)/2, 0.5, -h/2]))
+        self.HexPrismPoints.append(np.matrix([-np.sqrt(3)/2, -0.5, -h/2]))
 
     def connectHexPrismPoints(self, connectPoints, projectedPoints):
         for p in range(0, 11):
