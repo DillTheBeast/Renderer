@@ -102,14 +102,14 @@ cubeProjectedPoints = [
     [n, n] for n in range(len(cube.cubePoints))
 ]
 triangleProjectedPoints = [
-    [n, n] for n in range(len(Triangle.trianglePoints))
+    [n, n] for n in range(len(triangle.trianglePoints))
 ]
 pyramidProjectedPoints = [
-    [n, n] for n in range(len(Pyramid.pyramidPoints))
+    [n, n] for n in range(len(pyramid.pyramidPoints))
 ]
-hexPrismProjectedPoints = [
-    [n, n] for n in range(len(hexPrism.hexPrismPoints))
-]
+# hexPrismProjectedPoints = [
+#     [n, n] for n in range(len(hexPrism.hexPrismPoints))
+# ]
 
 
 def connectPoints(i, j, points):
@@ -145,7 +145,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         i += 1
     #Connecting the points
     if cube:
-        cube.connectCubePoints(connectPoints, projected2D)
+        cube.connectCubePoints(connectPoints, projectedPoints)
     elif triangle:
         for p in range(3):
             connectPoints(p, (p + 1) % 3, projectedPoints)
