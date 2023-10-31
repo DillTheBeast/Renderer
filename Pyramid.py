@@ -3,7 +3,7 @@ import numpy as np
 class Pyramid:
     def __init__(self):
         self.pyramidPoints = []
-        pyramidProjectedPoints = [
+        self.pyramidProjectedPoints = [
             [n, n] for n in range(len(self.pyramidPoints))
         ]
 

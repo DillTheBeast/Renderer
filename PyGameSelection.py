@@ -131,20 +131,19 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         # print("i:", i)
         # print("length of projectedPoints:", len(projectedPoints))
 
-        projectedPoints[i] = [x, y]
+        if i >= len(projectedPoints):
+            projectedPoints.append([x, y])
+        else:
+            projectedPoints[i] = [x, y]
         pygame.draw.circle(screen, shapeColor, (x, y), 5)
         i += 1
     #Connecting the points
     if cube:
         Cube.connectCubePoints(connectPoints, projectedPoints)
     elif triangle:
-        for p in range(3):
-            connectPoints(p, (p + 1) % 3, projectedPoints)
-            connectPoints(p, 3, projectedPoints)
+        Triangle.connectTrianglePoints(connectPoints, projectedPoints)
     elif pyramid:
-        for p in range(4):
-            connectPoints(p, (p + 1) % 4, projectedPoints)
-            connectPoints(p, 4, projectedPoints)
+        Pyramid.connectPyramidPoints(connectPoints, projectedPoints)
     elif hexPrism:
         for p in range(0, 11):
             if p != 5 and p != 10 and p != 4:
@@ -299,7 +298,7 @@ while True:
         elif triangle:
             movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False)
         elif pyramid:
-            movement(Pyramid.pyramidPoints, Triangle.pyramidProjectedPoints, i, False, False, True, False)
+            movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, i, False, False, True, False)
         #elif hexPrism:
             #movement(hexPrismPoints, hexPrismProjectedPoints, i, False, False, False, True, Cube)
     place = 20
