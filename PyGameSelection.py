@@ -78,16 +78,16 @@ circle_pos = [WIDTH / 2, HEIGHT / 2]
 angle = 0
 
 # For Cube
-cube = Cube()
-cube.appendCubePoints()
+Cube = Cube()
+Cube.appendCubePoints()
 
 # For Triangle
-triangle = Triangle()
-triangle.appendTrianglePoints()
+Triangle = Triangle()
+Triangle.appendTrianglePoints()
 
 # For Pyramid
-pyramid = Pyramid()
-pyramid.appendPyramidPoints()
+Pyramid = Pyramid()
+Pyramid.appendPyramidPoints()
 
 #For Hexagon Prism
 # hexPrism = hexPrism()
@@ -99,13 +99,13 @@ projection_matrix = np.matrix([
 ])
 
 cubeProjectedPoints = [
-    [n, n] for n in range(len(cube.cubePoints))
+    [n, n] for n in range(len(Cube.cubePoints))
 ]
 triangleProjectedPoints = [
-    [n, n] for n in range(len(triangle.trianglePoints))
+    [n, n] for n in range(len(Triangle.trianglePoints))
 ]
 pyramidProjectedPoints = [
-    [n, n] for n in range(len(pyramid.pyramidPoints))
+    [n, n] for n in range(len(Pyramid.pyramidPoints))
 ]
 # hexPrismProjectedPoints = [
 #     [n, n] for n in range(len(hexPrism.hexPrismPoints))
@@ -145,7 +145,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         i += 1
     #Connecting the points
     if cube:
-        cube.connectCubePoints(connectPoints, projectedPoints)
+        Cube.connectCubePoints(connectPoints, projectedPoints)
     elif triangle:
         for p in range(3):
             connectPoints(p, (p + 1) % 3, projectedPoints)
