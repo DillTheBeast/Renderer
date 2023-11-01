@@ -41,9 +41,9 @@ colorDark = (100,100,100)
 
 # defining a font
 smallfont = pygame.font.SysFont('Corbel', 35)
-#Rendering headers + button texts
+# Rendering headers + button texts
 texts = []
-header1 = smallfont.render('Background Color' , True , buttonText)
+header1 = smallfont.render('Background Color', True, buttonText)
 texts.append(header1)
 color1 = smallfont.render('Black', True, buttonText)
 texts.append(color1)
@@ -65,7 +65,8 @@ color9 = smallfont.render('Orange', True, buttonText)
 texts.append(color9)
 color10 = smallfont.render('Purple', True, buttonText)
 texts.append(color10)
-header2 = smallfont.render('Shape Color' , True , buttonText)
+
+header2 = smallfont.render('Shape Color', True, buttonText)
 backgroundColor = BLACK
 shapeColor = WHITE
 
@@ -92,6 +93,10 @@ Pyramid.appendPyramidPoints()
 #For Hexagon Prism
 HexPrism = HexPrism()
 HexPrism.appendHexPrismPoints()
+
+#For Sphere
+Sphere = Sphere()
+Sphere.appendSpherePoints()
 
 projection_matrix = np.matrix([
     [1, 0, 0],
@@ -299,7 +304,7 @@ while True:
             movement(Sphere.spherePoints, Sphere.sphereProjectedPoints, i, False, False, False, False, True)
     place = 20
     for i in range(2):
-        for j in range(len(texts)):
+        for j in range(0, len(texts)):
             screen.blit(texts[j], (20, place))
             place += 35
         place += 40
