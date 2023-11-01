@@ -107,7 +107,7 @@ def connectPoints(i, j, points):
     pygame.draw.line(screen, shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
 
-def check(object1, object2, object3, object4):
+def checkShapes(object1, object2, object3, object4):
     if object1:
         object1 = not object1
     elif object2: 
@@ -243,19 +243,19 @@ while True:
                 scale -= 96
             if event.key == pygame.K_c:
                 cube = not cube
-                pyramid, triangle, hexPrism, sphere = check(pyramid, triangle, hexPrism, sphere)
+                pyramid, triangle, hexPrism, sphere = checkShapes(pyramid, triangle, hexPrism, sphere)
             if event.key == pygame.K_p:
                 pyramid = not pyramid
-                cube, triangle, hexPrism, sphere = check(cube, triangle, hexPrism, sphere)
+                cube, triangle, hexPrism, sphere = checkShapes(cube, triangle, hexPrism, sphere)
             if event.key == pygame.K_t:
                 triangle = not triangle
-                pyramid, cube, hexPrism, sphere = check(pyramid, cube, hexPrism, sphere)
+                pyramid, cube, hexPrism, sphere = checkShapes(pyramid, cube, hexPrism, sphere)
             if event.key == pygame.K_h:
                 hexPrism = not hexPrism
-                pyramid, cube, triangle, sphere = check(pyramid, cube, triangle, sphere)
+                pyramid, cube, triangle, sphere = checkShapes(pyramid, cube, triangle, sphere)
             if event.key == pygame.K_l:
                 sphere = not sphere
-                pyramid, cube, triangle, hexPrism = check(pyramid, cube, triangle, hexPrism)
+                pyramid, cube, triangle, hexPrism = checkShapes(pyramid, cube, triangle, hexPrism)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 x, y = pygame.mouse.get_pos()
