@@ -7,6 +7,7 @@ from Triangle import Triangle
 from Pyramid import Pyramid
 from Sphere import Sphere
 from HexPrism import HexPrism
+from ColorsAndText import ColorsAndText
 
 pygame.init()
 
@@ -98,13 +99,16 @@ HexPrism.appendHexPrismPoints()
 Sphere = Sphere()
 Sphere.appendSpherePoints()
 
+ColorsAndText = ColorsAndText()
+ColorsAndText.addColors()
+
 projection_matrix = np.matrix([
     [1, 0, 0],
     [0, 1, 0]
 ])
 
 def connectPoints(i, j, points):
-    pygame.draw.line(screen, shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
+    pygame.draw.line(screen, ColorsAndText.shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
 
 def checkShapes(object1, object2, object3, object4):
@@ -152,73 +156,6 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, sphe
         HexPrism.connectHexPrismPoints(connectPoints, projectedPoints)
 
 
-def colors(x, y, backgroundColor, shapeColor):
-    if 20 <= x <= 100:
-        if 60 <= y <= 80:
-            #Black
-            backgroundColor = BLACK
-        elif 100 <= y <= 115:
-            #White
-            backgroundColor = WHITE
-        elif 135 <= y <= 150:
-            #Blue
-            backgroundColor = BLUE
-        elif 170 <= y <= 185:
-            #Red
-            backgroundColor = RED
-        elif 205 <= y <= 220:
-            #Green
-            backgroundColor = GREEN
-        elif 240 <= y <= 255:
-            #Grey
-            backgroundColor = GREY
-        elif 275 <= y <= 290:
-            #Pink
-            backgroundColor = PINK
-        elif 310 <= y <= 325:
-            #Cyan
-            backgroundColor = CYAN
-        elif 345 <= y <= 360:
-            #Orange
-            backgroundColor = ORANGE
-        elif 380 <= y <= 395:
-            #Purple
-            backgroundColor = PURPLE
-
-        #Now onto shape colors
-        elif 490 <= y <= 505:
-            #Black2
-            shapeColor = BLACK
-        elif 525 <= y <= 540:
-            #White2
-            shapeColor = WHITE
-        elif 560 <= y <= 575:
-            #Blue2
-            shapeColor = BLUE
-        elif 595 <= y <= 610:
-            #Red2
-            shapeColor = RED
-        elif 630 <= y <= 645:
-            #Green2
-            shapeColor = GREEN
-        elif 665 <= y <= 680:
-            #Grey2
-            shapeColor = GREY
-        elif 700 <= y <= 715:
-            #Pink2
-            shapeColor = PINK
-        elif 735 <= y <= 750:
-            #Cyan2
-            shapeColor = CYAN
-        elif 770 <= y <= 785:
-            #Orange2
-            shapeColor = ORANGE
-        elif 805 <= y <= 820:
-            #Purple2
-            shapeColor = PURPLE
-    return backgroundColor, shapeColor
-
-
 clock = pygame.time.Clock()
 
 while True:
@@ -258,10 +195,10 @@ while True:
                 pyramid, cube, triangle, hexPrism = checkShapes(pyramid, cube, triangle, hexPrism)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
-                x, y = pygame.mouse.get_pos()
-                backgroundColor, shapeColor = colors(x, y, backgroundColor, shapeColor)
-                if x > 100:
-                    circle_pos = [x,y]
+                ColorsAndText.x, ColorsAndText.y = pygame.mouse.get_pos()
+                ColorsAndText.changeColors()
+                if ColorsAndText.x > 100:
+                    circle_pos = [ColorsAndText.x, ColorsAndText.y]
 
     #Doing these keys pressed this way so it also works for holding    
     keys = pygame.key.get_pressed()  # get the state of all the keys
@@ -296,7 +233,7 @@ while True:
         else:
             angle -= 0.01
 
-        screen.fill(backgroundColor)
+        screen.fill(ColorsAndText.backgroundColor)
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
@@ -312,15 +249,15 @@ while True:
     place = 20
     for i in range(2):
         if i == 0:
-            header = header1
+            header = ColorsAndText.header1
         else:
-            header = header2
+            header = ColorsAndText.header2
             
         screen.blit(header, (20, place))
         place += 35
         
         for j in range(1, len(texts)):
-            screen.blit(texts[j], (20, place))
+            screen.blit(ColorsAndText.texts[j], (20, place))
             place += 35
         place += 40
 
