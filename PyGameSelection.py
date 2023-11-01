@@ -106,6 +106,7 @@ projection_matrix = np.matrix([
 def connectPoints(i, j, points):
     pygame.draw.line(screen, shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
+
 def check(object1, object2, object3, object4):
     if object1:
         object1 = not object1
@@ -117,6 +118,7 @@ def check(object1, object2, object3, object4):
         object4 = not object4
 
     return object1, object2, object3, object4
+
 
 def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, sphere):
     #Making dots at updated/rotated points
@@ -148,6 +150,74 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, sphe
         Pyramid.connectPyramidPoints(connectPoints, projectedPoints)
     elif hexPrism:
         HexPrism.connectHexPrismPoints(connectPoints, projectedPoints)
+
+
+def colors(x, y, backgroundColor, shapeColor):
+    if 20 <= x <= 100:
+        if 60 <= y <= 80:
+            #Black
+            backgroundColor = BLACK
+        elif 100 <= y <= 115:
+            #White
+            backgroundColor = WHITE
+        elif 135 <= y <= 150:
+            #Blue
+            backgroundColor = BLUE
+        elif 170 <= y <= 185:
+            #Red
+            backgroundColor = RED
+        elif 205 <= y <= 220:
+            #Green
+            backgroundColor = GREEN
+        elif 240 <= y <= 255:
+            #Grey
+            backgroundColor = GREY
+        elif 275 <= y <= 290:
+            #Pink
+            backgroundColor = PINK
+        elif 310 <= y <= 325:
+            #Cyan
+            backgroundColor = CYAN
+        elif 345 <= y <= 360:
+            #Orange
+            backgroundColor = ORANGE
+        elif 380 <= y <= 395:
+            #Purple
+            backgroundColor = PURPLE
+
+        #Now onto shape colors
+        elif 490 <= y <= 505:
+            #Black2
+            shapeColor = BLACK
+        elif 525 <= y <= 540:
+            #White2
+            shapeColor = WHITE
+        elif 560 <= y <= 575:
+            #Blue2
+            shapeColor = BLUE
+        elif 595 <= y <= 610:
+            #Red2
+            shapeColor = RED
+        elif 630 <= y <= 645:
+            #Green2
+            shapeColor = GREEN
+        elif 665 <= y <= 680:
+            #Grey2
+            shapeColor = GREY
+        elif 700 <= y <= 715:
+            #Pink2
+            shapeColor = PINK
+        elif 735 <= y <= 750:
+            #Cyan2
+            shapeColor = CYAN
+        elif 770 <= y <= 785:
+            #Orange2
+            shapeColor = ORANGE
+        elif 805 <= y <= 820:
+            #Purple2
+            shapeColor = PURPLE
+    return backgroundColor, shapeColor
+
 
 clock = pygame.time.Clock()
 
@@ -189,70 +259,7 @@ while True:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 x, y = pygame.mouse.get_pos()
-                if 20 <= x <= 100:
-                    if 60 <= y <= 80:
-                        #Black
-                        backgroundColor = BLACK
-                    elif 100 <= y <= 115:
-                        #White
-                        backgroundColor = WHITE
-                    elif 135 <= y <= 150:
-                        #Blue
-                        backgroundColor = BLUE
-                    elif 170 <= y <= 185:
-                        #Red
-                        backgroundColor = RED
-                    elif 205 <= y <= 220:
-                        #Green
-                        backgroundColor = GREEN
-                    elif 240 <= y <= 255:
-                        #Grey
-                        backgroundColor = GREY
-                    elif 275 <= y <= 290:
-                        #Pink
-                        backgroundColor = PINK
-                    elif 310 <= y <= 325:
-                        #Cyan
-                        backgroundColor = CYAN
-                    elif 345 <= y <= 360:
-                        #Orange
-                        backgroundColor = ORANGE
-                    elif 380 <= y <= 395:
-                        #Purple
-                        backgroundColor = PURPLE
-
-                    #Now onto shape colors
-                    elif 490 <= y <= 505:
-                        #Black2
-                        shapeColor = BLACK
-                    elif 525 <= y <= 540:
-                        #White2
-                        shapeColor = WHITE
-                    elif 560 <= y <= 575:
-                        #Blue2
-                        shapeColor = BLUE
-                    elif 595 <= y <= 610:
-                        #Red2
-                        shapeColor = RED
-                    elif 630 <= y <= 645:
-                        #Green2
-                        shapeColor = GREEN
-                    elif 665 <= y <= 680:
-                        #Grey2
-                        shapeColor = GREY
-                    elif 700 <= y <= 715:
-                        #Pink2
-                        shapeColor = PINK
-                    elif 735 <= y <= 750:
-                        #Cyan2
-                        shapeColor = CYAN
-                    elif 770 <= y <= 785:
-                        #Orange2
-                        shapeColor = ORANGE
-                    elif 805 <= y <= 820:
-                        #Purple2
-                        shapeColor = PURPLE
-
+                backgroundColor, shapeColor = colors(x, y, backgroundColor, shapeColor)
                 if x > 100:
                     circle_pos = [x,y]
 
