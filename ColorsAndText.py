@@ -57,7 +57,7 @@ class ColorsAndText:
             if 60 <= self.y <= 80:
                 #Black
                 self.backgroundColor = self.BLACK
-            elif 100 <= y <= 115:
+            elif 100 <= self.y <= 115:
                 #White
                 self.backgroundColor = self.WHITE
             elif 135 <= self.y <= 150:

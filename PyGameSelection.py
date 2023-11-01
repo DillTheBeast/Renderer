@@ -23,54 +23,6 @@ moveDown = False
 moveLeft = False
 moveRight = False
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-GREY = (192,192,192)
-PINK = (255,182,193)
-CYAN = (0,255,255)
-ORANGE = (255,165,0)
-PURPLE = (186,85,211)
-
-#Button Colors
-buttonText = (255, 87, 51)
-buttonShell = (255, 255, 237)
-colorLight = (170,170,170)  
-colorDark = (100,100,100)
-
-# defining a font
-smallfont = pygame.font.SysFont('Corbel', 35)
-# Rendering headers + button texts
-texts = []
-header1 = smallfont.render('Background Color', True, buttonText)
-texts.append(header1)
-color1 = smallfont.render('Black', True, buttonText)
-texts.append(color1)
-color2 = smallfont.render('White', True, buttonText)
-texts.append(color2)
-color3 = smallfont.render('Blue', True, buttonText)
-texts.append(color3)
-color4 = smallfont.render('Red', True, buttonText)
-texts.append(color4)
-color5 = smallfont.render('Green', True, buttonText)
-texts.append(color5)
-color6 = smallfont.render('Grey', True, buttonText)
-texts.append(color6)
-color7 = smallfont.render('Pink', True, buttonText)
-texts.append(color7)
-color8 = smallfont.render('Cyan', True, buttonText)
-texts.append(color8)
-color9 = smallfont.render('Orange', True, buttonText)
-texts.append(color9)
-color10 = smallfont.render('Purple', True, buttonText)
-texts.append(color10)
-
-header2 = smallfont.render('Shape Color', True, buttonText)
-backgroundColor = BLACK
-shapeColor = WHITE
-
 WIDTH, HEIGHT = 1440, 845
 pygame.display.set_caption("3d Renderer")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -143,7 +95,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, sphe
             projectedPoints.append([x, y])
         else:
             projectedPoints[i] = [x, y]
-        pygame.draw.circle(screen, shapeColor, (x, y), 5)
+        pygame.draw.circle(screen, ColorsAndText.shapeColor, (x, y), 5)
         i += 1
     #Connecting the points
     if cube:
@@ -256,7 +208,7 @@ while True:
         screen.blit(header, (20, place))
         place += 35
         
-        for j in range(1, len(texts)):
+        for j in range(1, len(ColorsAndText.texts)):
             screen.blit(ColorsAndText.texts[j], (20, place))
             place += 35
         place += 40
