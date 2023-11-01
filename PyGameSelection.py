@@ -304,9 +304,17 @@ while True:
             movement(Sphere.spherePoints, Sphere.sphereProjectedPoints, i, False, False, False, False, True)
     place = 20
     for i in range(2):
-        for j in range(0, len(texts)):
+        if i == 0:
+            header = header1
+        else:
+            header = header2
+            
+        screen.blit(header, (20, place))
+        place += 35
+        
+        for j in range(1, len(texts)):
             screen.blit(texts[j], (20, place))
             place += 35
         place += 40
-        texts[0] = header2
+
     pygame.display.update()
