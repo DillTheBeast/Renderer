@@ -101,17 +101,19 @@ projection_matrix = np.matrix([
 def connectPoints(i, j, points):
     pygame.draw.line(screen, shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
-def check(object1, object2, object3):
+def check(object1, object2, object3, object4):
     if object1:
         object1 = not object1
-    if object2: 
+    elif object2: 
         object2 = not object2
-    if object3:
+    elif object3:
         object3 = not object3
+    elif object4:
+        object4 = not object4
 
-    return object1, object2, object3
+    return object1, object2, object3, object4
 
-def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
+def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism, sphere):
     #Making dots at updated/rotated points
     for point in points:
         rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
@@ -140,13 +142,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
     elif pyramid:
         Pyramid.connectPyramidPoints(connectPoints, projectedPoints)
     elif hexPrism:
-        for p in range(0, 11):
-            if p != 5 and p != 10 and p != 4:
-                connectPoints(p, p + 2, projectedPoints)
-            if p == 6 or p == 0 or p == 10 or p == 4:
-                connectPoints(p, p + 1, projectedPoints)
-            if p < 6:
-                connectPoints(p, p + 6, projectedPoints)
+        HexPrism.connectHexPrismPoints(connectPoints, projectedPoints)
 
 clock = pygame.time.Clock()
 
@@ -172,16 +168,19 @@ while True:
                 scale -= 96
             if event.key == pygame.K_c:
                 cube = not cube
-                pyramid, triangle, hexPrism = check(pyramid, triangle, hexPrism)
+                pyramid, triangle, hexPrism, sphere = check(pyramid, triangle, hexPrism, sphere)
             if event.key == pygame.K_p:
                 pyramid = not pyramid
-                cube, triangle, hexPrism = check(cube, triangle, hexPrism)
+                cube, triangle, hexPrism, sphere = check(cube, triangle, hexPrism, sphere)
             if event.key == pygame.K_t:
                 triangle = not triangle
-                pyramid, cube, hexPrism = check(pyramid, cube, hexPrism)
+                pyramid, cube, hexPrism, sphere = check(pyramid, cube, hexPrism, sphere)
             if event.key == pygame.K_h:
                 hexPrism = not hexPrism
-                pyramid, cube, triangle = check(pyramid, cube, triangle)
+                pyramid, cube, triangle, sphere = check(pyramid, cube, triangle, sphere)
+            if event.key == pygame.K_l:
+                sphere = not sphere
+                pyramid, cube, triangle, hexPrism = check(pyramid, cube, triangle, hexPrism)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 x, y = pygame.mouse.get_pos()
@@ -289,13 +288,15 @@ while True:
         #Finding out which shape I want to display and displaying it
         i = 0
         if cube:
-            movement(Cube.cubePoints, Cube.cubeProjectedPoints, i, True, False, False, False)
+            movement(Cube.cubePoints, Cube.cubeProjectedPoints, i, True, False, False, False, False)
         elif triangle:
-            movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False)
+            movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False, False)
         elif pyramid:
-            movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, i, False, False, True, False)
+            movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, i, False, False, True, False, False)
         elif hexPrism:
-            movement(HexPrism.HexPrismPoints, HexPrism.HexPrismProjectedPoints, i, False, False, False, True)
+            movement(HexPrism.HexPrismPoints, HexPrism.HexPrismProjectedPoints, i, False, False, False, True, False)
+        elif sphere:
+            movement(Sphere.spherePoints, Sphere.sphereProjectedPoints, i, False, False, False, False, True)
     place = 20
     for i in range(2):
         for j in range(len(texts)):
