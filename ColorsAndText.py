@@ -1,3 +1,5 @@
+import pygame
+smallfont = pygame.font.SysFont('Corbel', 35)
 class ColorsAndText:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -9,6 +11,7 @@ class ColorsAndText:
     CYAN = (0,255,255)
     ORANGE = (255,165,0)
     PURPLE = (186,85,211)
+    
     def __init__(self):
         texts = []
         header1 = smallfont.render('Background Color', True, buttonText)
