@@ -30,6 +30,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 scale = 96
 circle_pos = [WIDTH / 2, HEIGHT / 2]
 angle = 0
+angleAddition = 0.01
 
 # For Cube
 Cube = Cube()
@@ -145,6 +146,10 @@ while True:
             if event.key == pygame.K_l:
                 sphere = not sphere
                 pyramid, cube, triangle, hexPrism = checkShapes(pyramid, cube, triangle, hexPrism)
+            if event.key == pygame.K_f:
+                angleAddition += 0.01
+            if event.key == pygame.K_b:
+                angleAddition -= 0.01
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 ColorsAndText.x, ColorsAndText.y = pygame.mouse.get_pos()
@@ -181,10 +186,9 @@ while True:
         ])
 
         if forward:
-            #angle += 0.01
-            angle += 0.03
+            angle += angleAddition
         else:
-            angle -= 0.01
+            angle -= angleAddition
 
         screen.fill(ColorsAndText.backgroundColor)
         #Finding out which shape I want to display and displaying it
