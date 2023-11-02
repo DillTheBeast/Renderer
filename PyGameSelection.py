@@ -52,6 +52,7 @@ HexPrism.appendHexPrismPoints()
 Sphere = Sphere()
 Sphere.appendSpherePoints()
 
+#For the colors and the texts displayed
 ColorsAndText = ColorsAndText()
 ColorsAndText.addColors()
 
