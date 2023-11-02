@@ -7,7 +7,6 @@ class ColorsAndText:
     def __init__(self):
         self.texts = []
         self.buttonText = (255, 87, 51)
-        self.buttonShell = (1, 50, 32)
         self.smallfont = pygame.font.SysFont('Corbel', 35)
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
@@ -23,11 +22,10 @@ class ColorsAndText:
         self.y = 0
         self.backgroundColor = self.BLACK
         self.shapeColor = self.WHITE
-        self.runButton = runButton
+        self.runButton = self.smallfont.render('Run', True, self.buttonText)
 
     def addColors(self):
         # Rendering headers + button texts
-        self.runButton = self.smallfont.render('Run', True, self.buttonShell)
         self.header1 = self.smallfont.render('Background Color', True, self.buttonText)
         self.texts.append(self.header1)
         color1 = self.smallfont.render('Black', True, self.buttonText)
@@ -56,6 +54,7 @@ class ColorsAndText:
         shapeColor = self.WHITE
 
     def changeColors(self):
+        WIDTH, HEIGHT = 1440, 845
         if 20 <= self.x <= 100:
             if 60 <= self.y <= 80:
                 #Black
@@ -119,3 +118,6 @@ class ColorsAndText:
             elif 805 <= self.y <= 820:
                 #Purple2
                 self.shapeColor = self.PURPLE
+        elif 1440-55 <= self.x <= 1440 - 5:
+            if 10 <= self.x <= 30:
+                self.shapeColor = self.GREEN

@@ -217,6 +217,6 @@ while True:
             screen.blit(ColorsAndText.texts[j], (20, place))
             place += 35
         place += 40
-    screen.blit(ColorsAndText.runButton, (WIDTH-20, HEIGHT-20))
+    screen.blit(ColorsAndText.runButton, (WIDTH-55, 10))
 
     pygame.display.update()
