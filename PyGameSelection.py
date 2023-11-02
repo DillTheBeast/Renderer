@@ -65,7 +65,7 @@ def connectPoints(i, j, points):
     pygame.draw.line(screen, ColorsAndText.shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
 
-def checkShapes(object1, object2, object3, object4):
+def checkShapes(change, object1, object2, object3, object4):
     if object1:
         object1 = not object1
     elif object2: 
@@ -75,7 +75,9 @@ def checkShapes(object1, object2, object3, object4):
     elif object4:
         object4 = not object4
 
-    return object1, object2, object3, object4
+    change = not change
+
+    return change, object1, object2, object3, object4
 
 
 def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
@@ -124,38 +126,22 @@ while True:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
-            if event.key == pygame.K_SPACE:
-                paused = not paused
-            if event.key == pygame.K_r: 
-                forward = not forward
-            if event.key == pygame.K_UP:
-                scale += 96
-            if event.key == pygame.K_DOWN:
-                scale -= 96
-            if event.key == pygame.K_c:
-                cube = not cube
-                pyramid, triangle, hexPrism, sphere = checkShapes(pyramid, triangle, hexPrism, sphere)
-            if event.key == pygame.K_p:
-                pyramid = not pyramid
-                cube, triangle, hexPrism, sphere = checkShapes(cube, triangle, hexPrism, sphere)
-            if event.key == pygame.K_t:
-                triangle = not triangle
-                pyramid, cube, hexPrism, sphere = checkShapes(pyramid, cube, hexPrism, sphere)
-            if event.key == pygame.K_h:
-                hexPrism = not hexPrism
-                pyramid, cube, triangle, sphere = checkShapes(pyramid, cube, triangle, sphere)
-            if event.key == pygame.K_l:
-                sphere = not sphere
-                pyramid, cube, triangle, hexPrism = checkShapes(pyramid, cube, triangle, hexPrism)
-            if event.key == pygame.K_f:
-                angleAddition += 0.01
-            if event.key == pygame.K_b:
-                angleAddition -= 0.01
+            if event.key == pygame.K_SPACE: paused = not paused
+            if event.key == pygame.K_r: forward = not forward
+            if event.key == pygame.K_UP: scale += 96
+            if event.key == pygame.K_DOWN: scale -= 96
+            if event.key == pygame.K_c: cube, pyramid, triangle, hexPrism, sphere = checkShapes(cube, pyramid, triangle, hexPrism, sphere)
+            if event.key == pygame.K_p: pyramid, cube, triangle, hexPrism, sphere = checkShapes(pyramid, cube, triangle, hexPrism, sphere)
+            if event.key == pygame.K_t: triangle, pyramid, cube, hexPrism, sphere = checkShapes(triangle, pyramid, cube, hexPrism, sphere)
+            if event.key == pygame.K_h: hexPrism, pyramid, cube, triangle, sphere = checkShapes(hexPrism, pyramid, cube, triangle, sphere)
+            if event.key == pygame.K_l: sphere, pyramid, cube, triangle, hexPrism = checkShapes(sphere, pyramid, cube, triangle, hexPrism)
+            if event.key == pygame.K_f: angleAddition += 0.01
+            if event.key == pygame.K_b: angleAddition -= 0.01
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Check if left mouse button is clicked
                 ColorsAndText.x, ColorsAndText.y = pygame.mouse.get_pos()
                 ColorsAndText.changeColors()
-                if ColorsAndText.x > 100:
+                if ColorsAndText.x > 100 and (ColorsAndText.x < 1440 - 60 and ColorsAndText.y > 35):
                     circle_pos = [ColorsAndText.x, ColorsAndText.y]
 
     #Doing these keys pressed this way so it also works for holding    
