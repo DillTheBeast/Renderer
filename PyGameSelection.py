@@ -181,7 +181,8 @@ while True:
         ])
 
         if forward:
-            angle += 0.01
+            #angle += 0.01
+            angle += 0.03
         else:
             angle -= 0.01
 
