@@ -187,17 +187,16 @@ while True:
 
         screen.fill(ColorsAndText.backgroundColor)
         #Finding out which shape I want to display and displaying it
-        i = 0
         if cube:
-            movement(Cube.cubePoints, Cube.cubeProjectedPoints, i, True, False, False, False)
+            movement(Cube.cubePoints, Cube.cubeProjectedPoints, 0, True, False, False, False)
         elif triangle:
-            movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, i, False, True, False, False)
+            movement(Triangle.trianglePoints, Triangle.triangleProjectedPoints, 0, False, True, False, False)
         elif pyramid:
-            movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, i, False, False, True, False)
+            movement(Pyramid.pyramidPoints, Pyramid.pyramidProjectedPoints, 0, False, False, True, False)
         elif hexPrism:
-            movement(HexPrism.HexPrismPoints, HexPrism.HexPrismProjectedPoints, i, False, False, False, True)
+            movement(HexPrism.HexPrismPoints, HexPrism.HexPrismProjectedPoints, 0, False, False, False, True)
         elif sphere:
-            movement(Sphere.spherePoints, Sphere.sphereProjectedPoints, i, False, False, False, False)
+            movement(Sphere.spherePoints, Sphere.sphereProjectedPoints, 0, False, False, False, False)
     place = 20
     for i in range(2):
         if i == 0:
