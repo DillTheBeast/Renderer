@@ -118,6 +118,7 @@ class ColorsAndText:
             elif 805 <= self.y <= 820:
                 #Purple2
                 self.shapeColor = self.PURPLE
-        elif 1440-55 <= self.x <= 1440 - 5:
-            if 10 <= self.x <= 30:
-                self.shapeColor = self.GREEN
+        elif 1440-35 <= self.x <= 1440:
+            if 10 <= self.y <= 30:
+                print("Test")
+

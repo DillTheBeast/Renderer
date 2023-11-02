@@ -141,7 +141,7 @@ while True:
             if event.button == 1:  # Check if left mouse button is clicked
                 ColorsAndText.x, ColorsAndText.y = pygame.mouse.get_pos()
                 ColorsAndText.changeColors()
-                if ColorsAndText.x > 100 and (ColorsAndText.x < 1440 - 60 and ColorsAndText.y > 35):
+                if ColorsAndText.x > 100 and (ColorsAndText.x < 1000 and ColorsAndText.y > 35):
                     circle_pos = [ColorsAndText.x, ColorsAndText.y]
 
     #Doing these keys pressed this way so it also works for holding    
