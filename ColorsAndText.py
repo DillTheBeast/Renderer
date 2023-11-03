@@ -23,6 +23,7 @@ class ColorsAndText:
         self.backgroundColor = self.BLACK
         self.shapeColor = self.WHITE
         self.runButton = self.smallfont.render('Run', True, self.buttonText)
+        self.falling = False
 
     def addColors(self):
         # Rendering headers + button texts
@@ -118,7 +119,11 @@ class ColorsAndText:
             elif 805 <= self.y <= 820:
                 #Purple2
                 self.shapeColor = self.PURPLE
-        elif 1440-35 <= self.x <= 1440:
+        elif 1440-55 <= self.x <= 1440:
             if 10 <= self.y <= 30:
-                print("Test")
+                self.falling = not self.falling
+                if self.falling:
+                    print("Falling")
+                else:
+                    print("No")
 

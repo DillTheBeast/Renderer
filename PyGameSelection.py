@@ -155,6 +155,9 @@ while True:
     if keys[pygame.K_a]:
         circle_pos[0] -= 5
     if not paused:
+        if ColorsAndText.falling:
+            #Need to move object down
+            circle_pos[1] += 5
         # update shape rotations
         rotationZ = np.matrix([
             [cos(angle), -sin(angle), 0],
