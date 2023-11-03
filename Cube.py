@@ -16,6 +16,14 @@ class Cube:
             [1, 2, 6, 5]   # right face
         ]
 
+        # Load the texture
+        self.texture = pygame.image.load('texture.jpeg')  # Replace with the actual path of your texture file
+
+        # Create surfaces for each face
+        self.face_surfaces = []
+        for _ in self.cubeFaces:
+            self.face_surfaces.append(pygame.Surface((self.texture.get_width(), self.texture.get_height()), pygame.SRCALPHA))
+            self.face_surfaces[-1].blit(self.texture, (0, 0))
 
     def appendCubePoints(self):
         self.cubePoints.append(np.array([-1, -1, 1]))
@@ -26,18 +34,12 @@ class Cube:
         self.cubePoints.append(np.array([1, -1, -1]))
         self.cubePoints.append(np.array([1, 1, -1]))
         self.cubePoints.append(np.array([-1, 1, -1]))
-    
+
     def connectCubePoints(self, screen, connectPoints, projectedPoints):
-        purple = (128, 0, 128)
-
-        # Drawing filled polygons for each face
-        for face in self.cubeFaces:
+        for i, face in enumerate(self.cubeFaces):
             points = [projectedPoints[i] for i in face]
-            pygame.draw.polygon(screen, purple, points)
-
-        # Drawing edges
-        for p in range(4):
-            connectPoints(p, (p + 1) % 4, projectedPoints)
-            connectPoints(p + 4, ((p + 1) % 4) + 4, projectedPoints)
-            connectPoints(p, p + 4, projectedPoints)
-
+            screen.blit(self.face_surfaces[i], pygame.draw.polygon(screen, (0, 0, 0, 0), points))
+            for p in range(4):
+                connectPoints(p, (p + 1) % 4, projectedPoints)
+                connectPoints(p + 4, ((p + 1) % 4) + 4, projectedPoints)
+                connectPoints(p, p + 4, projectedPoints)
