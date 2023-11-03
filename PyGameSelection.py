@@ -8,6 +8,7 @@ from Pyramid import Pyramid
 from Sphere import Sphere
 from HexPrism import HexPrism
 from ColorsAndText import ColorsAndText
+from Physics import Physics
 
 pygame.init()
 
@@ -31,6 +32,9 @@ scale = 96
 circle_pos = [WIDTH / 2, HEIGHT / 2]
 angle = 0
 angleAddition = 0.01
+wall_thickness = 10
+gravity = 0.5
+bounceStop = 0.3
 
 # For Cube
 Cube = Cube()
@@ -55,6 +59,9 @@ Sphere.appendSpherePoints()
 #For the colors and the texts displayed
 ColorsAndText = ColorsAndText()
 ColorsAndText.addColors()
+
+#For the physics
+# physics = Physics()
 
 projection_matrix = np.matrix([
     [1, 0, 0],
@@ -103,7 +110,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         i += 1
     #Connecting the points
     if cube:
-        Cube.connectCubePoints(connectPoints, projectedPoints)
+        Cube.connectCubePoints(screen, connectPoints, projectedPoints)
     elif triangle:
         Triangle.connectTrianglePoints(connectPoints, projectedPoints)
     elif pyramid:
