@@ -110,7 +110,7 @@ def movement(points, projectedPoints, i, cube, triangle, pyramid, hexPrism):
         i += 1
     #Connecting the points
     if cube:
-        Cube.connectCubePoints(screen, connectPoints, Cube.cubeProjectedPoints, angle)
+        Cube.connectCubePoints(screen, cube.cubeProjectedPoints)
     elif triangle:
         Triangle.connectTrianglePoints(connectPoints, projectedPoints)
     elif pyramid:
