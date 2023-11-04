@@ -24,13 +24,13 @@ class Cube:
         self.cubePoints.append(np.array([1, 1, -1]))
         self.cubePoints.append(np.array([-1, 1, -1]))
 
-    def connectCubePoints(self, screen, projectedPoints):
+    def connectCubePoints(self, screen, projectedPoints, connectPoints):
         purple = (128, 0, 128)
 
         # Drawing filled polygons for each face
         for face in self.cubeFaces:
             points = [projectedPoints[i] for i in face]
-            pygame.draw.polygon(screen, purple, points)
+            pygame.draw.polygon(screen - 1, purple, points)
 
         # Drawing edges
         edges = [
@@ -43,3 +43,8 @@ class Cube:
             start_point = projectedPoints[edge[0]]
             end_point = projectedPoints[edge[1]]
             pygame.draw.line(screen, purple, start_point, end_point)
+        
+        for p in range(4):
+            connectPoints(p, (p + 1) % 4, projectedPoints)
+            connectPoints(p + 4, ((p + 1) % 4) + 4, projectedPoints)
+            connectPoints(p, p + 4, projectedPoints)
