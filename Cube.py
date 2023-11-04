@@ -30,7 +30,7 @@ class Cube:
         # Drawing filled polygons for each face
         for face in self.cubeFaces:
             points = [projectedPoints[i] for i in face]
-            pygame.draw.polygon(screen - 1, purple, points)
+            pygame.draw.polygon(screen, purple, points)
 
         # Drawing edges
         edges = [
