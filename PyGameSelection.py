@@ -51,8 +51,7 @@ Pyramid.appendPyramidPoints()
 #For Hexagon Prism
 HexPrism = HexPrism()
 HexPrism.appendHexPrismPoints()
-
-#For Sphere
+#For Sp65555555here
 Sphere = Sphere()
 Sphere.appendSpherePoints()
 
