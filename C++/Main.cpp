@@ -15,13 +15,16 @@
 int gScreenHeight = 640;
 int gScreenWidth = 480;
 SDL_Window* gGraphicsAppWindow = nullptr;
-SDL_GLContext* gOpenGLContext = nullptr;
+SDL_GLContext* gOpenGLContext = nullptr; 
 
 void InitializeProgram() {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL2 could not initialize video subsystem" << std::endl;
         exit(1);
     }
+    //Making the window
+    //SDL_Window * SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+    gGraphicsAppWindow = SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
 }
 
 void MainLoop() {
