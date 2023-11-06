@@ -12,12 +12,19 @@
 #include <iostream>
 
 //Global Variables
-int gScreenHeight = 640;
-int gScreenWidth = 480;
+int gScreenWidth = 640;
+int gScreenHeight = 480;
 SDL_Window* gGraphicsAppWindow = nullptr;
 SDL_GLContext gOpenGLContext; // Changed this line
 
 bool gQuit = false; //If true, we quit
+
+void GetOpenGLVersionInfo() {
+    std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
+    std::cout << "Renderer: " <<glGetString(GL_RENDERER) << std::endl;
+    std::cout << "Version: " <<glGetString(GL_VERSION ) << std::endl;
+    std::cout << "Shading Language: " <<glGetString(GL_SHADING_LANGUAGE) << std::endl;
+}
 
 void InitializeProgram() {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -56,6 +63,11 @@ void Input() {
         if(e.type == SDL_QUIT) {
             std::cout << "See ya" << std::endl;
             gQuit = true;
+        } else if(e.type == SDL_KEYDOWN) {
+            if(e.key.keysym.sym == SDLK_ESCAPE) {
+                std::cout << "See ya" << std::endl;
+                gQuit = true;
+            }
         }
     }
 }
