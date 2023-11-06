@@ -25,6 +25,17 @@ void InitializeProgram() {
     //Making the window
     //SDL_Window * SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
     gGraphicsAppWindow = SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+    if(gGraphicsAppWindow == nullptr) {
+        str::cout << "SDL Window was not able to be created" << std::endl;
+        exit(1);
+    }
+
+    gOpenGLContext = SDL_GL_CreateContext(gGraphicsAppWindow);
+
+    if(gOpenGLContext == nullptr) {
+        std::cout << "OpenGL context not available\n";
+        exit(1);
+    }
 }
 
 void MainLoop() {
