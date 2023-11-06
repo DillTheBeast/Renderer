@@ -6,9 +6,10 @@
     // Render
 // 3, Clean up
 
-//Compile with this: g++ -o main main.cpp -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
-
+//Compile with this: g++ -o main main.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
+//Run with ./main 
 #include <SDL2/SDL.h>
+#include <glad/glad.h>
 #include <iostream>
 
 //Global Variables
@@ -23,7 +24,7 @@ void GetOpenGLVersionInfo() {
     std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
     std::cout << "Renderer: " <<glGetString(GL_RENDERER) << std::endl;
     std::cout << "Version: " <<glGetString(GL_VERSION ) << std::endl;
-    std::cout << "Shading Language: " <<glGetString(GL_SHADING_LANGUAGE) << std::endl;
+    std::cout << "Shading Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 }
 
 void InitializeProgram() {
@@ -54,6 +55,13 @@ void InitializeProgram() {
         std::cout << "OpenGL context not available\n";
         exit(1);
     }
+
+    //Initialize the Glad Library
+    if(!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
+        std::cout << "Glad was not initialized properly" << std::endl;
+        exit(1);
+    }
+
 }
 
 void Input() {
