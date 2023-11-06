@@ -5,7 +5,6 @@
     // Updates
     // Render
 // 3, Clean up
-
 #include <SDL2/SDL.h>
 
 int main(int argc, char *argv[]) {
@@ -17,6 +16,4 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
     return 0;
 }
-
-
 
