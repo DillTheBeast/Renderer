@@ -114,7 +114,11 @@ void CleanUp() {
 int main() {
 
     InitializeProgram();
+
+    VertexSpecification();
+
     MainLoop();
+
     CleanUp();
 
     return 0;
