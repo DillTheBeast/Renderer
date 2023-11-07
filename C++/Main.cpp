@@ -28,12 +28,14 @@ void GetOpenGLVersionInfo() {
 }
 
 void InitializeProgram() {
+    //Setup SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cout << "SDL2 could not initialize video subsystem" << std::endl;
         exit(1);
     }
 
     //Using OpenGL version 4.1
+    //Set up OpenGL attributes
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
@@ -62,6 +64,7 @@ void InitializeProgram() {
         exit(1);
     }
 
+    GetOpenGLVersionInfo();
 }
 
 void Input() {
