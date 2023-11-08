@@ -148,16 +148,17 @@ void InitializeProgram() {
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     //Making the window
-    gGraphicsAppWindow = SDL_CreateWindow("Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+    gGraphicsAppWindow = SDL_CreateWindow("Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    //Check if window did not create
     if(gGraphicsAppWindow == nullptr) {
-        std::cout << "SDL Window was not able to be created" << std::endl;
+        std::cout << "SDL Window was not able to be created! SDL Error: " << SDL_GetError() << "\n";
         exit(1);
     }
 
+    //Create an OpenGL graphics Context
     gOpenGLContext = SDL_GL_CreateContext(gGraphicsAppWindow);
-
     if(gOpenGLContext == nullptr) {
-        std::cout << "OpenGL context not available\n";
+        std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << "\n";
         exit(1);
     }
 
@@ -167,7 +168,6 @@ void InitializeProgram() {
         exit(1);
     }
 
-    GetOpenGLVersionInfo();
 }
 
 void Input() {
