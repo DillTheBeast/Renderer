@@ -178,11 +178,21 @@ void Input() {
 }
 
 void PreDraw() {
-     
+   //Responsible for setting openGL's state
+   glDisable(GL_DEPTH_TEST);  
+   glDisable(GL_CULL_FACE);
+
+   glViewport(0, 0, gScreenWidth, gScreenHeight);
+   glClearColor(1.f, 1.f, 0.f, 1.f);
+
+   glUseProgram(gGraphicsPipelineShaderProgram);
 }
 
 void Draw() {
+    glBindVertexArray(gVertexArrayObject);
+    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void MainLoop() {
