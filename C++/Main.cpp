@@ -20,11 +20,27 @@ SDL_GLContext gOpenGLContext; // Changed this line
 
 bool gQuit = false; //If true, we quit
 
+//VAO
+Gluint gVertexArrayObject = 0;
+
 void GetOpenGLVersionInfo() {
     std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
     std::cout << "Renderer: " <<glGetString(GL_RENDERER) << std::endl;
     std::cout << "Version: " <<glGetString(GL_VERSION ) << std::endl;
     std::cout << "Shading Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+}
+
+void VertexSpecification() {
+
+    //Lives on the CPU
+    const std::vector<GLfloat> vertexPosition {
+        //x     y     z
+        -0.8f, -0.8f, 0.0f, //Vertex 1
+        0.8f, -0.8f, 0.0f;  // Vertex 2
+        0.0f, 0.8f, 0.0f   // Vertex 3
+    };
+
+    glGenVertexArrays(1, &gVertexArrayObject)
 }
 
 void InitializeProgram() {
@@ -116,6 +132,8 @@ int main() {
     InitializeProgram();
 
     VertexSpecification();
+
+    CreateGraphicsPipeline();
 
     MainLoop();
 
