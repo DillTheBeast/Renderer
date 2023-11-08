@@ -26,6 +26,8 @@ GLuint gVertexArrayObject = 0;
 //VBO
 GLuint gVertexBufferObject = 0;
 
+void 
+
 void GetOpenGLVersionInfo() {
     std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
     std::cout << "Renderer: " <<glGetString(GL_RENDERER) << std::endl;
@@ -36,7 +38,7 @@ void GetOpenGLVersionInfo() {
 void VertexSpecification() {
 
     //Lives on the CPU
-    const std::vector<GLfloat> vertexPosition {
+    const std::vector<GLfloat> vertexPosition{
         //x     y     z
         -0.8f, -0.8f, 0.0f, //Vertex 1
         0.8f, -0.8f, 0.0f,  // Vertex 2
@@ -45,7 +47,7 @@ void VertexSpecification() {
 
     // Start to set things up
     // on the GPU
-    gGenVertexArrays(1, &gVertexArrayObject)
+    glGenVertexArrays(1, &gVertexArrayObject);
     glBindVertexArray(gVertexArrayObject);
 
     //Start generating our VBO
