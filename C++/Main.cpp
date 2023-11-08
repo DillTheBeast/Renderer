@@ -6,7 +6,7 @@
     // Render
 // 3, Clean up
 
-//Compile with this: g++ -o main main.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
+//Compile with this: g++ -std=c++11 -o main main.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
 //Run with ./main 
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
@@ -25,8 +25,66 @@ bool gQuit = false; //If true, we quit
 GLuint gVertexArrayObject = 0;
 //VBO
 GLuint gVertexBufferObject = 0;
+//Program object(for shaders)
+GLuint gGraphicsPipelineShaderProgram = 0;
 
-void 
+//Vertex shader executes once per vertex, and will be in charge of
+// the final position of the vertex.
+const std::string gVertexShaderSource = 
+    "#version 410 core\n"
+    "in vec4 position;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(position.x, position.y, position.z, position.w);\n"
+    "}\n";
+//Fragment shader
+//The frahment shader executes once per frame (i.e. roughly for every pixel that will be rasterized),
+//and in part determines the final color that will be sent to the screen.
+const std::string gFragmentShaderSource =
+    "#version 410 core\n"
+    "out vec4 color;\n"
+    "void main()\n"
+    "{\n"
+    "   color = vec4(1,0f, 0.5f, 0.0f, 1.0f);\n"
+    "}\n";
+
+GLuint CompileShader(GLuint type, const std::string& source) {
+    GLuint shaderObject;
+
+    if(type == GL_VERTEX_SHADER) {
+        shaderObject = glCreateShader(GL_VERTEX_SHADER);
+    } else if(type == GL_FRAGMENT_SHADER) {
+        shaderObject = glCreateShader(GL_FRAGMENT_SHADER);
+    } 
+
+    const char* src = source.c_str();
+    glShaderSource(shaderObject, 1, &src, nullptr);
+    glCompileShader(shaderObject);
+
+    return shaderObject;
+}
+
+GLuint CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader) {
+    GLuint programObject = glCreateProgram();
+
+    GLuint myVertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    glAttachShader(programObject, myVertexShader);
+    glAttachShader(programObject, myFragmentShader);
+    glLinkProgram(programObject);
+
+    //Validate our program
+    glValidateProgram(programObject);
+    //glDetachShader, glDeletShader
+
+
+    return programObject;
+}
+
+void CreateGraphicsPipeline() {
+    gGraphicsPipelineShaderProgram = CreateShaderProgram(gVertexShaderSource, gFragmentShaderSource);
+}
 
 void GetOpenGLVersionInfo() {
     std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
@@ -38,8 +96,7 @@ void GetOpenGLVersionInfo() {
 void VertexSpecification() {
 
     //Lives on the CPU
-    const std::vector<GLfloat> vertexPosition{
-        //x     y     z
+    const std::vector<GLfloat> vertexPosition = {
         -0.8f, -0.8f, 0.0f, //Vertex 1
         0.8f, -0.8f, 0.0f,  // Vertex 2
         0.0f, 0.8f, 0.0f   // Vertex 3
@@ -52,7 +109,7 @@ void VertexSpecification() {
 
     //Start generating our VBO
     //Use the & because of a c base api
-    glGenBuffer(1, &glVertexBufferObject);
+    glGenBuffers(1, &gVertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
     glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GLfloat), vertexPosition.data(), GL_STATIC_DRAW);
 
