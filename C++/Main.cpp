@@ -104,10 +104,10 @@ void GetOpenGLVersionInfo() {
 void VertexSpecification() {
 
     //Lives on the CPU
-    const std::vector<GLfloat> vertexPosition = {
-        -0.8f, -0.8f, 0.0f, //Vertex 1
-        0.8f, -0.8f, 0.0f,  // Vertex 2
-        0.0f, 0.8f, 0.0f   // Vertex 3
+    const std::vector<GLfloat> vertexPosition {
+        -0.8f, -0.8f, 0.0f, // Left Vertex Position
+        0.8f, -0.8f, 0.0f,  // Right Vertex Position
+        0.0f, 0.8f, 0.0f   // Top Vertex Position
     };
 
     // Start to set things up
