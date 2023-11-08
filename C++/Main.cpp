@@ -21,7 +21,9 @@ SDL_GLContext gOpenGLContext; // Changed this line
 bool gQuit = false; //If true, we quit
 
 //VAO
-Gluint gVertexArrayObject = 0;
+GLuint gVertexArrayObject = 0;
+//VBO
+GLuint gVertexBufferObject = 0;
 
 void GetOpenGLVersionInfo() {
     std::cout << "Vendor: " <<glGetString(GL_VENDOR) << std::endl;
@@ -40,7 +42,17 @@ void VertexSpecification() {
         0.0f, 0.8f, 0.0f   // Vertex 3
     };
 
-    glGenVertexArrays(1, &gVertexArrayObject)
+    gGenVertexArrays(1, &gVertexArrayObject)
+    glBindVertexArray(gVertexArrayObject);
+
+    //Start generating our VBO
+    //Use the & because of a c base api
+    glGenBuffer(1, &glVertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GLfloat), vertexPosition.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, )
 }
 
 void InitializeProgram() {
