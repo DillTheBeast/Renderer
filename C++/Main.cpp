@@ -14,22 +14,30 @@
 #include <vector>
 
 //Global Variables
+//Screen dimensions
 int gScreenWidth = 640;
 int gScreenHeight = 480;
 SDL_Window* gGraphicsAppWindow = nullptr;
-SDL_GLContext gOpenGLContext; // Changed this line
+SDL_GLContext gOpenGLContext = nullptr; // Changed this line
 
 bool gQuit = false; //If true, we quit
 
-//VAO
-GLuint gVertexArrayObject = 0;
-//VBO
-GLuint gVertexBufferObject = 0;
-//Program object(for shaders)
+//shader
+//Stores unique id for graphics pipeline
+//program objects = used for opengl draw calls
 GLuint gGraphicsPipelineShaderProgram = 0;
+
+//OpenGL objects
+//Vertex Array Object (VAO)
+//VAO = encapsulates all of the items needed to render an object
+GLuint gVertexArrayObject = 0;
+// Vertex Buffer Object (VBO)
+//Stores info relating to vertices (positions, normals, textures)
+GLuint gVertexBufferObject = 0;
 
 //Vertex shader executes once per vertex, and will be in charge of
 // the final position of the vertex.
+// Mechanism for arranging geometry on the GPU
 const std::string gVertexShaderSource = 
     "#version 410 core\n"
     "in vec4 position;\n"
@@ -121,10 +129,11 @@ void VertexSpecification() {
 
 }
 
+//Open up a window + openGL context
 void InitializeProgram() {
     //Setup SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cout << "SDL2 could not initialize video subsystem" << std::endl;
+        std::cout << "SDL2 could not initialize! SDL Error: " << SDL_GetError() << "\n";
         exit(1);
     }
 
@@ -132,14 +141,14 @@ void InitializeProgram() {
     //Set up OpenGL attributes
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    //Request double buffer for smooth updating
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
     //Making the window
-    //SDL_Window * SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
-    gGraphicsAppWindow = SDL_CreateWindow("Renderer", 0, 0, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
+    gGraphicsAppWindow = SDL_CreateWindow("Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL);
     if(gGraphicsAppWindow == nullptr) {
         std::cout << "SDL Window was not able to be created" << std::endl;
         exit(1);
@@ -215,16 +224,23 @@ void CleanUp() {
     SDL_Quit();
 }
 
+//Main entry point for program 
 int main() {
 
+    //Setup graphics program
     InitializeProgram();
 
+    //Setup geometry
     VertexSpecification();
 
+    //Create vertex + graphics pipeline
+    //Min = vertex + fragment shader
     CreateGraphicsPipeline();
 
+    //Call the main application loop
     MainLoop();
 
+    //Call the cleanup function when our program ends 
     CleanUp();
 
     return 0;
