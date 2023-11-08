@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include <glad/glad.h>
 #include <iostream>
+#include <vector>
 
 //Global Variables
 int gScreenWidth = 640;
@@ -38,10 +39,12 @@ void VertexSpecification() {
     const std::vector<GLfloat> vertexPosition {
         //x     y     z
         -0.8f, -0.8f, 0.0f, //Vertex 1
-        0.8f, -0.8f, 0.0f;  // Vertex 2
+        0.8f, -0.8f, 0.0f,  // Vertex 2
         0.0f, 0.8f, 0.0f   // Vertex 3
     };
 
+    // Start to set things up
+    // on the GPU
     gGenVertexArrays(1, &gVertexArrayObject)
     glBindVertexArray(gVertexArrayObject);
 
@@ -52,7 +55,11 @@ void VertexSpecification() {
     glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GLfloat), vertexPosition.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, )
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    glBindVertexArray(0);
+    glDisableVertexAttribArray(0);
+
 }
 
 void InitializeProgram() {
