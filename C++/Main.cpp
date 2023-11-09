@@ -104,7 +104,7 @@ void GetOpenGLVersionInfo() {
 void VertexSpecification() {
 
     //Lives on the CPU
-    const std::vector<GLfloat> vertexPosition {
+    const std::vector<GLfloat> vertexPositions {
         -0.8f, -0.8f, 0.0f, // Left Vertex Position
         0.8f, -0.8f, 0.0f,  // Right Vertex Position
         0.0f, 0.8f, 0.0f   // Top Vertex Position
@@ -119,7 +119,7 @@ void VertexSpecification() {
     //Use the & because of a c base api
     glGenBuffers(1, &gVertexBufferObject);
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, vertexPosition.size() * sizeof(GLfloat), vertexPosition.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(GLfloat), vertexPositions.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);

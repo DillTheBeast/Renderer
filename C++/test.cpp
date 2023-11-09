@@ -1,44 +1,16 @@
-#include <SDL.h>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <GL/glut.h>
+#include <GL/gl.h>
 #include <iostream>
 #include <vector>
-
-const int WIDTH = 1440;
-const int HEIGHT = 845;
-
-bool paused = false;
-bool forward = false;
-bool triangle = false;
-bool pyramid = false;
-bool cube = true;
-bool hexPrism = false;
-bool sphere = false;
-bool moveUp = false;
-bool moveDown = false;
-bool moveLeft = false;
-bool moveRight = false;
-
-int scale = 96;
-int circle_pos[2] = { WIDTH / 2, HEIGHT / 2 };
-float angle = 0;
-float angleAddition = 0.01;
-int wall_thickness = 10;
-float gravity = 0.5;
-float bounceStop = 0.3;
-
-GLuint vertexArrayObject;
-GLuint vertexBufferObject;
+#include <cmath>
 
 class Cube {
 public:
-    std::vector<glm::vec3> cubePoints;
+    std::vector<std::vector<float>> cubePoints;
+    std::vector<std::vector<float>> cubeProjectedPoints;
     std::vector<std::vector<int>> cubeFaces;
 
     Cube() {
-        appendCubePoints();
         cubeFaces = {
             {0, 1, 2, 3},  // front face
             {4, 5, 6, 7},  // back face
@@ -47,178 +19,180 @@ public:
             {0, 3, 7, 4},  // left face
             {1, 2, 6, 5}   // right face
         };
+
+        appendCubePoints();
     }
 
     void appendCubePoints() {
-        cubePoints.push_back(glm::vec3(-1, -1, 1));
-        cubePoints.push_back(glm::vec3(1, -1, 1));
-        cubePoints.push_back(glm::vec3(1, 1, 1));
-        cubePoints.push_back(glm::vec3(-1, 1, 1));
-        cubePoints.push_back(glm::vec3(-1, -1, -1));
-        cubePoints.push_back(glm::vec3(1, -1, -1));
-        cubePoints.push_back(glm::vec3(1, 1, -1));
-        cubePoints.push_back(glm::vec3(-1, 1, -1));
+        cubePoints.push_back({-1.0, -1.0, 1.0});
+        cubePoints.push_back({1.0, -1.0, 1.0});
+        cubePoints.push_back({1.0, 1.0, 1.0});
+        cubePoints.push_back({-1.0, 1.0, 1.0});
+        cubePoints.push_back({-1.0, -1.0, -1.0});
+        cubePoints.push_back({1.0, -1.0, -1.0});
+        cubePoints.push_back({1.0, 1.0, -1.0});
+        cubePoints.push_back({-1.0, 1.0, -1.0});
     }
 
-    void setupBuffers() {
-        glGenVertexArrays(1, &vertexArrayObject);
-        glGenBuffers(1, &vertexBufferObject);
-
-        glBindVertexArray(vertexArrayObject);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-
-        glBufferData(GL_ARRAY_BUFFER, cubePoints.size() * sizeof(glm::vec3), &cubePoints[0], GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
-
-    void draw(GLuint shaderProgram, glm::mat4 model) {
-        glUseProgram(shaderProgram);
-        glBindVertexArray(vertexArrayObject);
-
-        glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-
-        glDrawArrays(GL_POINTS, 0, cubePoints.size());
-        glDrawElements(GL_QUADS, 24, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
-    }
-
-    void connectCubePoints(glm::mat4 model, GLuint shaderProgram) {
-        GLuint uColorLocation = glGetUniformLocation(shaderProgram, "uColor");
-        glUniform3f(uColorLocation, 0.5f, 0.0f, 0.0f);
-
-        for (const auto& face : cubeFaces) {
-            glBegin(GL_LINE_LOOP);
-            for (const auto& index : face) {
-                glVertex3f(cubePoints[index].x, cubePoints[index].y, cubePoints[index].z);
-            }
-            glEnd();
-        }
+    void connectCubePoints() {
+        // Implement connection logic here
     }
 };
 
-void createShaderProgram() {
-    const char* vertexShaderSource = R"(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
-        uniform mat4 model;
-        void main()
-        {
-            gl_Position = model * vec4(aPos, 1.0);
-            gl_PointSize = 5.0;
-        }
-    )";
+bool paused = false;
+bool forward = false;
+bool triangle = false;
+bool pyramid = false;
+bool cubeFlag = true;
+bool hexPrism = false;
+bool sphere = false;
+bool moveUp = false;
+bool moveDown = false;
+bool moveLeft = false;
+bool moveRight = false;
 
-    const char* fragmentShaderSource = R"(
-        #version 330 core
-        out vec4 FragColor;
-        uniform vec3 uColor;
-        void main()
-        {
-            FragColor = vec4(uColor, 1.0);
-        }
-    )";
+int WIDTH = 1440;
+int HEIGHT = 845;
+float scale = 96.0;
+std::vector<float> circle_pos = {static_cast<float>(WIDTH / 2), static_cast<float>(HEIGHT / 2)};
+float angle = 0.0;
+float angleAddition = 0.01;
+float wall_thickness = 10.0;
+float gravity = 0.5;
+float bounceStop = 0.3;
 
-    GLuint vertexShader, fragmentShader;
-    GLint success;
-    GLchar infoLog[512];
+float projection_matrix[2][3] = {
+    {1, 0, 0},
+    {0, 1, 0}
+};
 
-    // Vertex Shader
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
+float rotationZ[3][3];
+float rotationY[3][3];
+float rotationX[3][3];
 
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // Fragment Shader
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // Shader Program
-    GLuint shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    glUseProgram(shaderProgram);
+void connectPoints(int i, int j, std::vector<std::vector<float>>& points) {
+    glBegin(GL_LINES);
+    glColor3f(1.0, 1.0, 1.0);
+    glVertex2f(points[i][0], points[i][1]);
+    glVertex2f(points[j][0], points[j][1]);
+    glEnd();
 }
 
-void render(Cube& cube, GLuint shaderProgram, glm::mat4 model) {
-    cube.draw(shaderProgram, model);
-    cube.connectCubePoints(model, shaderProgram);
+void checkShapes(bool& change, bool& object1, bool& object2, bool& object3, bool& object4) {
+    if (object1) {
+        object1 = false;
+    } else if (object2) {
+        object2 = false;
+    } else if (object3) {
+        object3 = false;
+    } else if (object4) {
+        object4 = false;
+    }
+
+    change = !change;
 }
 
-int main(int argc, char* argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
+void movement(std::vector<std::vector<float>>& points, int i, bool cube, bool triangle, bool pyramid, bool hexPrism) {
+    for (auto& point : points) {
+        float rotated2D[3] = {0};
+        for (int j = 0; j < 3; j++) {
+            rotated2D[j] = rotationZ[j][0] * point[0] + rotationZ[j][1] * point[1] + rotationZ[j][2] * point[2];
+        }
+        for (int j = 0; j < 3; j++) {
+            rotated2D[j] = rotationX[j][0] * rotated2D[0] + rotationX[j][1] * rotated2D[1] + rotationX[j][2] * rotated2D[2];
+        }
+        for (int j = 0; j < 3; j++) {
+            rotated2D[j] = rotationY[j][0] * rotated2D[0] + rotationY[j][1] * rotated2D[1] + rotationY[j][2] * rotated2D[2];
+        }
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+        float projected2D[2] = {0};
+        for (int j = 0; j < 2; j++) {
+            projected2D[j] = projection_matrix[j][0] * rotated2D[0] + projection_matrix[j][1] * rotated2D[1] + projection_matrix[j][2] * rotated2D[2];
+        }
 
-    SDL_Window* window = SDL_CreateWindow("3D Renderer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_OPENGL);
-    if (!window) {
-        return -1;
+        int x = static_cast<int>(projected2D[0] * scale) + static_cast<int>(circle_pos[0]);
+        int y = static_cast<int>(projected2D[1] * scale) + static_cast<int>(circle_pos[1]);
+
+        if (i >= points.size()) {
+            points.push_back({x, y});
+        } else {
+            points[i] = {x, y};
+        }
+
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        glColor3f(1.0, 1.0, 1.0);
+        glVertex2f(x, y);
+        glEnd();
+        i++;
     }
 
-    SDL_GLContext context = SDL_GL_CreateContext(window);
+    if (cube) {
+        // Call cube connection function
+        // cube.connectCubePoints();
+    } else if (triangle) {
+        // Call triangle connection function
+    } else if (pyramid) {
+        // Call pyramid connection function
+    } else if (hexPrism) {
+        // Call hexPrism connection function
+    }
+}
 
-    if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+void render() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    if (!paused) {
+        angle += forward ? angleAddition : -angleAddition;
+
+        rotationZ[0][0] = cos(angle);
+        rotationZ[0][1] = -sin(angle);
+        rotationZ[0][2] = 0;
+        rotationZ[1][0] = sin(angle);
+        rotationZ[1][1] = cos(angle);
+        rotationZ[1][2] = 0;
+        rotationZ[2][0] = 0;
+        rotationZ[2][1] = 0;
+        rotationZ[2][2] = 1;
+
+        rotationY[0][0] = cos(angle);
+        rotationY[0][1] = 0;
+        rotationY[0][2] = sin(angle);
+        rotationY[1][0] = 0;
+        rotationY[1][1] = 1;
+        rotationY[1][2] = 0;
+        rotationY[2][0] = -sin(angle);
+        rotationY[2][1] = 0;
+        rotationY[2][2] = cos(angle);
+
+        rotationX[0][0] = 1;
+        rotationX[0][1] = 0;
+        rotationX[0][2] = 0;
+        rotationX[1][0] = 0;
+        rotationX[1][1] = cos(angle);
+        rotationX[1][2] = -sin(angle);
+        rotationX[2][0] = 0;
+        rotationX[2][1] = sin(angle);
+        rotationX[2][2] = cos(angle);
+
+        movement(Cube.cubePoints, 0, cubeFlag, triangle, pyramid, hexPrism);
     }
 
-    createShaderProgram();
+    glutSwapBuffers();
+}
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(WIDTH, HEIGHT);
+    glutCreateWindow("3D Renderer");
+    glEnable(GL_DEPTH_TEST);
 
-    Cube cube;
-    cube.setupBuffers();
+    glutDisplayFunc(render);
+    glutIdleFunc(render);
 
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(WIDTH), static_cast<float>(HEIGHT), 0.0f, -1.0f, 1.0f);
-
-    while (true) {
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(circle_pos[0], circle_pos[1], 0.0f));
-        model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::scale(model, glm::vec3(scale, scale, 1.0f));
-
-        render(cube, shaderProgram, model);
-
-        SDL_GL_SwapWindow(window);
-
-        angle += angleAddition;
-    }
-
-    SDL_GL_DeleteContext(context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    glutMainLoop();
 
     return 0;
 }
