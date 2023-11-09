@@ -142,287 +142,192 @@
 
 // Compile with: g++ -std=c++11 -o main main.cpp glad.c -I ./include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
 
-#include <SDL2/SDL.h>
 #include <glad/glad.h>
-#include <vector>
-#include <SDL2/SDL_gfxPrimitives.h>
+#include <GLFW/glfw3.h>
+#include <cmath>
 
-int gScreenWidth = 640;
-int gScreenHeight = 480;
-SDL_Window* gGraphicsAppWindow = nullptr;
-SDL_GLContext gOpenGLContext = nullptr; 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
 
-bool gQuit = false;
-GLuint gGraphicsPipelineShaderProgram = 0;
-GLuint gVertexArrayObject = 0;
-GLuint gVertexBufferObject = 0;
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
 
-const std::string gVertexShaderSource = 
-    "#version 410 core\n"
-    "in vec4 position;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(position.x, position.y, position.z, position.w);\n"
-    "}\n";
-
-const std::string gFragmentShaderSource =
-    "#version 410 core\n"
-    "out vec4 color;\n"
-    "void main()\n"
-    "{\n"
-    "   color = vec4(1, 0, 0.5, 1.0);\n"
-    "}\n";
-
-GLuint CompileShader(GLuint type, const std::string& source) {
-    GLuint shaderObject;
-
-    if(type == GL_VERTEX_SHADER) {
-        shaderObject = glCreateShader(GL_VERTEX_SHADER);
-    } else if(type == GL_FRAGMENT_SHADER) {
-        shaderObject = glCreateShader(GL_FRAGMENT_SHADER);
-    } 
-
-    const char* src = source.c_str();
-    glShaderSource(shaderObject, 1, &src, nullptr);
-    glCompileShader(shaderObject);
-
-    int result;
-    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &result);
-
-    if(result == GL_FALSE) {
-        int length;
-        glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &length);
-        char* errorMessage = new char[length];
-        glGetShaderInfoLog(shaderObject, length, &length, errorMessage);
-
-        if(type == GL_VERTEX_SHADER) {
-            std::cout << "ERROR: GL_VERTEX_SHADER compilation failed!\n" << errorMessage << "\n";
-        } else if (type == GL_FRAGMENT_SHADER) {
-            std::cout << "ERROR: GL_FRAGMENT_SHADER compilation failed!\n" << errorMessage << "\n";
-        }
-        delete[] errorMessage;
-        glDeleteShader(shaderObject);
-        return 0;
+const char* vertexShaderSource = R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+    uniform mat4 model;
+    uniform mat4 view;
+    uniform mat4 projection;
+    void main() {
+        gl_Position = projection * view * model * vec4(aPos, 1.0);
     }
+)";
 
-    return shaderObject;
-}
-
-GLuint CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader) {
-    GLuint programObject = glCreateProgram();
-
-    GLuint myVertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    glAttachShader(programObject, myVertexShader);
-    glAttachShader(programObject, myFragmentShader);
-    glLinkProgram(programObject);
-
-    //Validate our program
-    glValidateProgram(programObject);
-    //glDetachShader, glDeletShader
-    glDetachShader(programObject, myVertexShader);
-    glDetachShader(programObject, myFragmentShader);
-
-    glDeleteShader(myVertexShader);
-    glDeleteShader(myFragmentShader);
-
-    return programObject;
-}
-
-void CreateGraphicsPipeline() {
-    gGraphicsPipelineShaderProgram = CreateShaderProgram(gVertexShaderSource, gFragmentShaderSource);
-}
-
-void VertexSpecification() {
-    //Lives on the CPU
-    const std::vector<GLfloat> vertexPositions {
-        -0.8f, -0.8f, 0.0f, // Left Vertex Position
-        0.8f, -0.8f, 0.0f,  // Right Vertex Position
-        0.0f, 0.8f, 0.0f   // Top Vertex Position
-    };
-
-    // Start to set things up
-    // on the GPU
-    glGenVertexArrays(1, &gVertexArrayObject);
-    glBindVertexArray(gVertexArrayObject);
-
-    //Start generating our VBO
-    //Use the & because of a c base api
-    glGenBuffers(1, &gVertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(GLfloat), vertexPositions.data(), GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glBindVertexArray(0);
-    glDisableVertexAttribArray(0);
-}
-
-void InitializeProgram() {
-    //Lives on the CPU
-    const std::vector<GLfloat> vertexPositions {
-        -0.8f, -0.8f, 0.0f, // Left Vertex Position
-        0.8f, -0.8f, 0.0f,  // Right Vertex Position
-        0.0f, 0.8f, 0.0f   // Top Vertex Position
-    };
-
-    // Start to set things up
-    // on the GPU
-    glGenVertexArrays(1, &gVertexArrayObject);
-    glBindVertexArray(gVertexArrayObject);
-
-    //Start generating our VBO
-    //Use the & because of a c base api
-    glGenBuffers(1, &gVertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(GLfloat), vertexPositions.data(), GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-    glBindVertexArray(0);
-    glDisableVertexAttribArray(0);
-    VertexSpecification();
-    CreateGraphicsPipeline();
-}
-
-class Cube {
-    private:
-    std::vector<SDL_Point> cubePoints; // List of cube vertices in 3D
-    std::vector<SDL_Point> cubeProjectedPoints; // List of projected points (2D)
-    std::vector<std::vector<int>> cubeFaces; // List of faces, where each face is a list of vertex indices
-
-public:
-    Cube() {
-        // Define faces using vertex indices
-        cubeFaces = {
-            {0, 1, 2, 3},  // front face
-            {4, 5, 6, 7},  // back face
-            {0, 1, 5, 4},  // bottom face
-            {3, 2, 6, 7},  // top face
-            {0, 3, 7, 4},  // left face
-            {1, 2, 6, 5}   // right face
-        };
+const char* fragmentShaderSource = R"(
+    #version 330 core
+    out vec4 FragColor;
+    void main() {
+        FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     }
-
-    // Define cube vertices
-    void appendCubePoints() {
-        cubePoints.push_back({-1, -1});
-        cubePoints.push_back({1, -1});
-        cubePoints.push_back({1, 1});
-        cubePoints.push_back({-1, 1});
-        cubePoints.push_back({-1, -1});
-        cubePoints.push_back({1, -1});
-        cubePoints.push_back({1, 1});
-        cubePoints.push_back({-1, 1});
-    }
-
-    // Function to draw edges and filled faces of the cube
-    void connectCubePoints(SDL_Renderer* renderer, std::vector<SDL_Point>& projectedPoints) {
-        SDL_SetRenderDrawColor(renderer, 125, 23, 34, 255);
-
-        // Drawing edges
-        std::vector<std::pair<int, int>> edges = {
-            {0, 1}, {1, 2}, {2, 3}, {3, 0},  // front face
-            {4, 5}, {5, 6}, {6, 7}, {7, 4},  // back face
-            {0, 4}, {1, 5}, {2, 6}, {3, 7}   // connecting edges
-        };
-
-        for (const auto& edge : edges) {
-            SDL_RenderDrawLine(renderer, projectedPoints[edge.first].x, projectedPoints[edge.first].y,
-                                    projectedPoints[edge.second].x, projectedPoints[edge.second].y);
-        }
-
-        // Drawing filled polygons for each face
-        for (const auto& face : cubeFaces) {
-            std::vector<SDL_Point> points;
-            for (int i : face) {
-                points.push_back(projectedPoints[i]);
-            }
-            Sint16 vx[4] = {points[0].x, points[1].x, points[2].x, points[3].x};
-            Sint16 vy[4] = {points[0].y, points[1].y, points[2].y, points[3].y};
-            filledPolygonRGBA(renderer, vx, vy, 4, 125, 23, 34, 255);
-        }
-
-        // Connecting points within each face
-        for (int p = 0; p < 4; ++p) {
-            connectPoints(p, (p + 1) % 4, projectedPoints, renderer);
-            connectPoints(p + 4, ((p + 1) % 4) + 4, projectedPoints, renderer);
-            connectPoints(p, p + 4, projectedPoints, renderer);
-        }
-    }
-
-private:
-    // Function to draw a line between two points
-    void connectPoints(int start, int end, const std::vector<SDL_Point>& projectedPoints, SDL_Renderer* renderer) {
-        SDL_RenderDrawLine(renderer, projectedPoints[start].x, projectedPoints[start].y,
-                                projectedPoints[end].x, projectedPoints[end].y);
-    }
-};
-
-void Input() {
-    SDL_Event e;
-
-    while(SDL_PollEvent(&e) != 0) {
-        if(e.type == SDL_QUIT) {
-            std::cout << "See ya" << std::endl;
-            gQuit = true;
-        } else if(e.type == SDL_KEYDOWN) {
-            if(e.key.keysym.sym == SDLK_ESCAPE) {
-                std::cout << "See ya" << std::endl;
-                gQuit = true;
-            }
-        }
-    }
-}
-
-void PreDraw() {
-    //Responsible for setting openGL's state
-   glDisable(GL_DEPTH_TEST);  
-   glDisable(GL_CULL_FACE);
-
-   glViewport(0, 0, gScreenWidth, gScreenHeight);
-   glClearColor(1.f, 1.f, 0.f, 1.f);
-
-   glUseProgram(gGraphicsPipelineShaderProgram);
-}
-
-void Draw() {
-    glBindVertexArray(gVertexArrayObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-
-    // Draw the cube
-    Cube cube;
-    cube.appendCubePoints();
-
-    std::vector<SDL_Point> projectedPoints; // You'll need to implement this function in the Cube class
-    cube.connectCubePoints(nullptr, projectedPoints); // Pass nullptr for renderer since we're not using it here
-}
-
-void MainLoop() {
-    while(!gQuit) {
-        Input();
-
-        PreDraw();
-
-        Draw();
-
-        //Update the screen
-        SDL_GL_SwapWindow(gGraphicsAppWindow);
-    }
-}
-
-void CleanUp() {
-    SDL_DestroyWindow(gGraphicsAppWindow); // Also delete the window
-    SDL_Quit();
-}
+)";
 
 int main() {
-    InitializeProgram();
-    CreateGraphicsPipeline();
-    MainLoop();
-    CleanUp();
+    // Initialize GLFW
+    if (!glfwInit()) {
+        return -1;
+    }
+
+    // Set GLFW to not create an OpenGL context (we'll use GLAD for that)
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+    // Create a windowed mode window and its OpenGL context
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Spinning Cube", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
+
+    // Initialize GLAD
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        return -1;
+    }
+
+    // Compile vertex shader
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    GLint success;
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Compile fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // Link shaders into a shader program
+    GLuint shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    // Set up vertex data and buffers
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        0, 1, 5, 5, 4, 0,
+        2, 3, 7, 7, 6, 2,
+        0, 3, 7, 7, 4, 0,
+        1, 2, 6, 6, 5, 1
+    };
+
+    GLuint VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindVertexArray(0);
+
+    // Enable depth testing
+    glEnable(GL_DEPTH_TEST);
+
+    // Set the callback function for window resize
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    // Main loop
+    while (!glfwWindowShouldClose(window)) {
+        // Process input
+        processInput(window);
+
+        // Clear the screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Use our shader program
+        glUseProgram(shaderProgram);
+
+        // Set up transformations
+        float time = glfwGetTime();
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(45.0f) * time, glm::vec3(0.5f, 1.0f, 0.0f));
+        glm::mat4 view = glm::lookAt(glm::vec3(3.0f, 3.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        GLuint modelLoc = glGetUniformLocation(shaderProgram, "model");
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+        GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+        GLuint projLoc = glGetUniformLocation(shaderProgram, "projection");
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        // Draw the cube
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+        // Swap front and back buffers
+        glfwSwapBuffers(window);
+
+        // Poll for and process events
+        glfwPollEvents();
+    }
+
+    // Clean up
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
     return 0;
 }
