@@ -53,7 +53,7 @@ const std::string gFragmentShaderSource =
     "out vec4 color;\n"
     "void main()\n"
     "{\n"
-    "   color = vec4(1,0f, 0.5f, 0.0f, 1.0f);\n"
+    "   color = vec4(1, 0, 0.5, 1.0);\n"
     "}\n";
 
 GLuint CompileShader(GLuint type, const std::string& source) {
@@ -104,7 +104,11 @@ GLuint CreateShaderProgram(const std::string& vertexShader, const std::string& f
     //Validate our program
     glValidateProgram(programObject);
     //glDetachShader, glDeletShader
+    glDetachShader(programObject, myVertexShader);
+    glDetachShader(programObject, myFragmentShader);
 
+    glDeleteShader(myVertexShader);
+    glDeleteShader(myFragmentShader);
 
     return programObject;
 }
@@ -220,6 +224,7 @@ void Draw() {
     glBindVertexArray(gVertexArrayObject);
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
+    //Actual drawing
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
