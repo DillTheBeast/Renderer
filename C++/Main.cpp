@@ -69,6 +69,25 @@ GLuint CompileShader(GLuint type, const std::string& source) {
     glShaderSource(shaderObject, 1, &src, nullptr);
     glCompileShader(shaderObject);
 
+    int result;
+    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &result);
+
+    if(result == GL_FALSE) {
+        int length;
+        glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &length);
+        char* errorMessage = new char[length];
+        glGetShaderInfoLog(shaderObject, length, &length, errorMessage);
+
+        if(type == GL_VERTEX_SHADER) {
+            std::cout << "ERROR: GL_VERTEX_SHADER compilation failed!\n" << errorMessage << "\n";
+        } else if (type == GL_FRAGMENT_SHADER) {
+            std::cout << "ERROR: GL_FRAGMENT_SHADER compilation failed!\n" << errorMessage << "\n";
+        }
+        delete[] errorMessage;
+        glDeleteShader(shaderObject);
+        return 0;
+    }
+
     return shaderObject;
 }
 
