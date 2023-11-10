@@ -6,14 +6,17 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// Compile with: g++ -std=c++11 -o alone alone.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
+// Compile with: g++ -std=c++11 -o alone alone.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
+
 //Global Variables
 //Screen dimensions
 int gScreenWidth = 640;
 int gScreenHeight = 480;
 SDL_Window* gGraphicsAppWindow = nullptr;
 SDL_GLContext gOpenGLContext = nullptr; // Changed this line
-float gRotationAngle = 0.0f;
+float gRotationAngleX = 0.0f;
+float gRotationAngleY = 0.0f;
+
 
 bool gQuit = false; //If true, we quit
 
@@ -48,17 +51,37 @@ const std::string gFragmentShaderSource =
     "out vec4 color;\n"
     "void main()\n"
     "{\n"
-    "   color = vec4(1, 0, 0.5, 1.0);\n"
+    "   color = vec4(0, 1, 0, 1.0);\n" // Change the color to green
     "}\n";
 
-const std::string gVertexShaderSource = 
+
+const std::string VertexShaderSource = 
     "#version 410 core\n"
     "in vec4 position;\n"
-    "uniform mat4 rotationMatrix;\n"
+    "uniform float rotationX;\n"
+    "uniform float rotationY;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = rotationMatrix * vec4(position.x, position.y, position.z, position.w);\n"
+    "   float angleX = radians(rotationX);\n"
+    "   float angleY = radians(rotationY);\n"
+    "   mat4 rotationMatrixX = mat4(1.0);\n"
+    "   mat4 rotationMatrixY = mat4(1.0);\n"
+    "   rotationMatrixX = mat4(\n"
+    "       1,   0,          0, 0,\n"
+    "       0, cos(angleX), -sin(angleX), 0,\n"
+    "       0, sin(angleX),  cos(angleX), 0,\n"
+    "       0,   0,          0, 1\n"
+    "   );\n"
+    "   rotationMatrixY = mat4(\n"
+    "       cos(angleY), 0, sin(angleY), 0,\n"
+    "       0,           1, 0,          0,\n"
+    "      -sin(angleY), 0, cos(angleY), 0,\n"
+    "       0,           0, 0,          1\n"
+    "   );\n"
+    "   mat4 rotationMatrix = rotationMatrixY * rotationMatrixX;\n"
+    "   gl_Position = rotationMatrix * position;\n"
     "}\n";
+
 
 GLuint CompileShader(GLuint type, const std::string& source) {
     GLuint shaderObject;
@@ -120,18 +143,14 @@ GLuint CreateShaderProgram(const std::string& vertexShader, const std::string& f
 void CreateGraphicsPipeline() {
     gGraphicsPipelineShaderProgram = CreateShaderProgram(gVertexShaderSource, gFragmentShaderSource);
 
-    // Retrieve the location of the rotationMatrix uniform
     GLuint rotationMatrixLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "rotationMatrix");
+    GLuint rotationXLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "rotationX");
+    GLuint rotationYLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "rotationY");
 
-    // Initialize the rotationMatrix to the identity matrix
-    glm::mat4 rotationMatrix = glm::mat4(1.0f);
-
-    // Apply rotation angle to the matrix
-    rotationMatrix = glm::rotate(rotationMatrix, gRotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-
-    // Pass the rotation matrix to the shader
     glUseProgram(gGraphicsPipelineShaderProgram);
-    glUniformMatrix4fv(rotationMatrixLocation, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+    glUniformMatrix4fv(rotationMatrixLocation, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+    glUniform1f(rotationXLocation, gRotationAngleX);
+    glUniform1f(rotationYLocation, gRotationAngleY);
 }
 
 
@@ -258,21 +277,27 @@ void Draw() {
 }
 
 void MainLoop() {
-
     while(!gQuit) {
         Input();
 
-        gRotationAngle += 0.01f; // Adjust the speed of rotation as needed
+        gRotationAngleX += 0.01f; // Adjust the speed of rotation around the x-axis as needed
+        gRotationAngleY += 0.01f; // Adjust the speed of rotation around the y-axis as needed
+
+        // Update the rotation uniforms
+        GLuint rotationXLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "rotationX");
+        GLuint rotationYLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "rotationY");
+        glUseProgram(gGraphicsPipelineShaderProgram);
+        glUniform1f(rotationXLocation, gRotationAngleX);
+        glUniform1f(rotationYLocation, gRotationAngleY);
 
         PreDraw();
 
         Draw();
 
-        //Update the screen
         SDL_GL_SwapWindow(gGraphicsAppWindow);
     }
-
 }
+
 
 void CleanUp() {
     SDL_DestroyWindow(gGraphicsAppWindow); // Also delete the window
