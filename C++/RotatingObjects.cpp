@@ -61,7 +61,7 @@ void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& s
         backgroundChosen = color;
     } else if (shape) {
         shapeChosen = color;
-        std::cout << "TESTING " << shape << std::endl;
+        std::cout << "Setting shape color: R=" << color[0] << " G=" << color[1] << " B=" << color[2] << " A=" << color[3] << std::endl;
     }
 }
 
@@ -117,16 +117,17 @@ int main() {
 
     // Vertex data for the cube
     float vertices[] = {
-        // Positions           // Colors
+    // Positions           // Colors
         -0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
         -0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
         -0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
         -0.5f,  0.5f,   0.5f,    1.0f, 0.0f, 0.0f, 1.0f
     };
+
 
     // Indices for drawing the cube
     unsigned int indices[] = {
@@ -256,13 +257,15 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Set up the model matrix and rotate the cube
+        // Inside the main loop
         if (!pause) {
             model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+            std::cout << "Current shape color: R=" << shapeChosen[0] << " G=" << shapeChosen[1] << " B=" << shapeChosen[2] << " A=" << shapeChosen[3] << std::endl;
         }
 
         // Set the chosen color
-        glUniform3fv(glGetUniformLocation(shaderProgram, "FragColor"), 1, shapeChosen);
+        glUniform4fv(glGetUniformLocation(shaderProgram, "FragColor"), 1, shapeChosen);
 
         // Draw the cube
         glBindVertexArray(VAO);
