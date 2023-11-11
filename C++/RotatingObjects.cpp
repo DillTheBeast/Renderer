@@ -1,4 +1,4 @@
-//COMPILE WITH: g++ -std=c++11 -o alone alone.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
+//COMPILE WITH: g++ -std=c++11 -o RotatingObjects RotatingObjects.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
 
 #include <SDL2/SDL.h>
 #include "glad/glad.h"
@@ -6,41 +6,67 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <utility>
 
 // Vertex shader source code
 const char* vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec4 aColor; // Added input for color
+    out vec4 FragColor; // Pass color to fragment shader
+
     uniform mat4 model;
     uniform mat4 view;
     uniform mat4 projection;
+
     void main()
     {
         gl_Position = projection * view * model * vec4(aPos, 1.0f);
+        FragColor = aColor; // Pass color to fragment shader
     }
 )";
 
 // Fragment shader source code
 const char* fragmentShaderSource = R"(
     #version 330 core
-    out vec4 FragColor;
+    in vec4 FragColor; // Input color from vertex shader
+    out vec4 FragColorOut;
+
     void main()
     {
-        FragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        FragColorOut = FragColor; // Output the color
     }
 )";
 
 //Global variables
+bool pause = false;
+bool shape = false;
+bool background = false;
 float rotationSpeed = 0.02f;
-float blueColor[] = {
-    0.0f, 
-    0.0f, 
-    1.0f, 
-    1.0f
-};
+float blueColor[] = {0.0f, 0.0f, 1.0f, 1.0f};
+float redColor[] = {1.0f, 0.0f, 0.0f, 1.0f};
+float greenColor[] = {0.0f, 1.0f, 0.0f, 1.0f};
+float blackColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
+float whiteColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+float grayColor[] = {0.5f, 0.5f, 0.5f, 1.0f};
+float cyanColor[] = {0.0f, 1.0f, 1.0f, 1.0f};
+float purpleColor[] = {0.5f, 0.0f, 0.5f, 1.0f};
+float pinkColor[] = {1.0f, 0.75f, 0.8f, 1.0f};
+float orangeColor[] = {1.0f, 0.5f, 0.0f, 1.0f};
+float* backgroundChosen = blueColor; // Uses a pointer
+float* shapeChosen = blackColor; // Uses a pointer
+
+void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
+    if (background) {
+        backgroundChosen = color;
+    } else if (shape) {
+        shapeChosen = color;
+        std::cout << "TESTING " << shape << std::endl;
+    }
+}
 
 int main() {
-        // Initialize SDL
+    // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
         return -1;
@@ -91,14 +117,15 @@ int main() {
 
     // Vertex data for the cube
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,
-         0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-         0.5f, -0.5f,  0.5f,
-         0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f
+        // Positions           // Colors
+        -0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f,   0.5f,    1.0f, 0.0f, 0.0f, 1.0f
     };
 
     // Indices for drawing the cube
@@ -135,8 +162,11 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Set vertex attribute pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Unbind VBO and VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -168,18 +198,71 @@ int main() {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
+                std::cout << "See ya" << std::endl;
                 quit = true;
+            } else if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    std::cout << "See ya" << std::endl;
+                    quit = true;
+                }
+                if (event.key.keysym.sym == SDLK_SPACE) {
+                    pause = !pause;
+                }
+                if (event.key.keysym.sym == SDLK_MINUS) {
+                    std::cout << "TEST" << std::endl;
+                    shape = true;
+                    background = false;
+                }
+                if (event.key.keysym.sym == SDLK_EQUALS) {
+                    shape = false;
+                    background = true;
+                }
+                if (event.key.keysym.sym == SDLK_1) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, blackColor);
+                }
+                if (event.key.keysym.sym == SDLK_2) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, whiteColor);
+                }
+                if (event.key.keysym.sym == SDLK_3) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, blueColor);
+                }
+                if (event.key.keysym.sym == SDLK_4) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, redColor);
+                }
+                if (event.key.keysym.sym == SDLK_5) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, greenColor);
+                }
+                if (event.key.keysym.sym == SDLK_6) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, grayColor);
+                }
+                if (event.key.keysym.sym == SDLK_7) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, cyanColor);
+                }
+                if (event.key.keysym.sym == SDLK_8) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, orangeColor);
+                }
+                if (event.key.keysym.sym == SDLK_9) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, purpleColor);
+                }
+                if (event.key.keysym.sym == SDLK_0) {
+                    colorCheck(background, shape, backgroundChosen, shapeChosen, pinkColor);
+                }
             }
         }
 
-        glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+        glClearColor(backgroundChosen[0], backgroundChosen[1], backgroundChosen[2], backgroundChosen[3]);
 
         // Clear the color and depth buffers
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Set up the model matrix and rotate the cube
-        model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        if (!pause) {
+            model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        }
+
+        // Set the chosen color
+        glUniform3fv(glGetUniformLocation(shaderProgram, "FragColor"), 1, shapeChosen);
 
         // Draw the cube
         glBindVertexArray(VAO);
