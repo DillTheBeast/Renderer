@@ -12,17 +12,17 @@
 const char* vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
-    layout (location = 1) in vec4 aColor; // Added input for color
     out vec4 FragColor; // Pass color to fragment shader
 
     uniform mat4 model;
     uniform mat4 view;
     uniform mat4 projection;
+    uniform vec4 shapeColor; // New uniform for shape color
 
     void main()
     {
         gl_Position = projection * view * model * vec4(aPos, 1.0f);
-        FragColor = aColor; // Pass color to fragment shader
+        FragColor = shapeColor; // Use the uniform color for all vertices
     }
 )";
 
@@ -34,8 +34,9 @@ const char* fragmentShaderSource = R"(
 
     void main()
     {
-        FragColorOut = FragColor; // Output the color
+        FragColorOut = FragColor; // Output the uniform color
     }
+
 )";
 
 //Global variables
@@ -179,6 +180,7 @@ int main() {
     glUseProgram(shaderProgram);
 
     // Get uniform locations
+    unsigned int shapeColorLoc = glGetUniformLocation(shaderProgram, "shapeColor");
     unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
     unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
     unsigned int projLoc = glGetUniformLocation(shaderProgram, "projection");
@@ -256,7 +258,8 @@ int main() {
         }
 
         // Set the chosen color
-        glUniform4fv(glGetUniformLocation(shaderProgram, "FragColorOut"), 1, shapeChosen);
+        glUseProgram(shaderProgram);
+        glUniform4fv(shapeColorLoc, 1, shapeChosen);
 
         // Draw the cube
         glBindVertexArray(VAO);
