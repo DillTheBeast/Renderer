@@ -40,7 +40,7 @@ const char* fragmentShaderSource = R"(
 
 //Global variables
 bool pause = false;
-bool shape = false;
+bool shape = true;
 bool background = false;
 float rotationSpeed = 0.02f;
 float blueColor[] = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -54,15 +54,10 @@ float purpleColor[] = {0.5f, 0.0f, 0.5f, 1.0f};
 float pinkColor[] = {1.0f, 0.75f, 0.8f, 1.0f};
 float orangeColor[] = {1.0f, 0.5f, 0.0f, 1.0f};
 float* backgroundChosen = blueColor; // Uses a pointer
-float* shapeChosen = blackColor; // Uses a pointer
+float* shapeChosen = greenColor; // Uses a pointer
 
 void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
-    if (!background && shape) {
-        shapeChosen = color;
-        std::cout << "Setting shape color: R=" << color[0] << " G=" << color[1] << " B=" << color[2] << " A=" << color[3] << std::endl;
-    } else if (background) {
-        backgroundChosen = color;
-    }
+    shapeChosen = color;
 }
 
 int main() {
@@ -128,7 +123,6 @@ int main() {
         -0.5f,  0.5f,   0.5f,    1.0f, 0.0f, 0.0f, 1.0f
     };
 
-
     // Indices for drawing the cube
     unsigned int indices[] = {
         0, 1, 2,
@@ -193,6 +187,9 @@ int main() {
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+    // Set the initial color of the shape after OpenGL context creation
+    shapeChosen = greenColor;
+
     // Main loop
     bool quit = false;
     while (!quit) {
@@ -209,15 +206,9 @@ int main() {
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     pause = !pause;
                 }
-                if (event.key.keysym.sym == SDLK_MINUS) {
-                    std::cout << "TEST" << std::endl;
-                    shape = true;
-                    background = false;
-                }
-                if (event.key.keysym.sym == SDLK_EQUALS) {
-                    shape = false;
-                    background = true;
-                }
+
+                // Handle color change keys
+
                 if (event.key.keysym.sym == SDLK_1) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, blackColor);
                 }
@@ -265,7 +256,7 @@ int main() {
         }
 
         // Set the chosen color
-        glUniform4fv(glGetUniformLocation(shaderProgram, "FragColor"), 1, shapeChosen);
+        glUniform4fv(glGetUniformLocation(shaderProgram, "FragColorOut"), 1, shapeChosen);
 
         // Draw the cube
         glBindVertexArray(VAO);
@@ -273,7 +264,6 @@ int main() {
 
         // Swap the front and back buffers
         SDL_GL_SwapWindow(window);
-
     }
 
     // Clean up
