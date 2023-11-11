@@ -57,11 +57,11 @@ float* backgroundChosen = blueColor; // Uses a pointer
 float* shapeChosen = blackColor; // Uses a pointer
 
 void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
-    if (background) {
-        backgroundChosen = color;
-    } else if (shape) {
+    if (!background && shape) {
         shapeChosen = color;
         std::cout << "Setting shape color: R=" << color[0] << " G=" << color[1] << " B=" << color[2] << " A=" << color[3] << std::endl;
+    } else if (background) {
+        backgroundChosen = color;
     }
 }
 
@@ -273,6 +273,7 @@ int main() {
 
         // Swap the front and back buffers
         SDL_GL_SwapWindow(window);
+
     }
 
     // Clean up
