@@ -1,5 +1,6 @@
-//COMPILE WITH: g++ -std=c++11 -o RotatingObjects RotatingObjects.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2
-
+//COMPILE WITH: g++ -std=c++11 -o RotatingObjects RotatingObjects.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2 -framework OpenGL
+#define STB_IMAGE_IMPLEMENTATION
+#include "./stb-master/stb_image.h"
 #include <SDL2/SDL.h>
 #include "glad/glad.h"
 #include <iostream>
