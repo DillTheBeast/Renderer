@@ -279,6 +279,7 @@ int main() {
                         rotationSpeed -= 0.01f;
                     }
                 }
+
                 //Handle the positon of the shape
                 else if (event.key.keysym.sym == SDLK_w) {
                     cubeCenterY += 0.1f;
@@ -300,15 +301,11 @@ int main() {
         // Set up the model matrix and rotate the cube
         // Inside the main loop
         if (!pause) {
-            //Rotate the cube
+            // Rotate the cube
             model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            // std::cout << "Current shape color: R=" << shapeChosen[0] << " G=" << shapeChosen[1] << " B=" << shapeChosen[2] << " A=" << shapeChosen[3] << std::endl;
-
-            // Calculate and print the center coordinates
-            //glm::vec3 center = calculateCubeCenter(model);
-            //std::cout << "Center Coordinates: X=" << center.x << " Y=" << center.y << " Z=" << center.z << std::endl;
         }
+
 
         // Set the chosen color
         glUseProgram(shaderProgram);
