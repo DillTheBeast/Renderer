@@ -208,7 +208,7 @@ int main() {
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     std::cout << "See ya" << std::endl;
                     quit = true;
-                }
+                } 
                 if (event.key.keysym.sym == SDLK_SPACE) {
                     pause = !pause;
                 }
@@ -217,40 +217,39 @@ int main() {
                 if (event.key.keysym.sym == SDLK_MINUS) {
                     shape = true;
                     background = false;
-                }
-                if (event.key.keysym.sym == SDLK_EQUALS) {
+                } else if (event.key.keysym.sym == SDLK_EQUALS) {
                     background = true;
                     shape = false;
-                }
-                if (event.key.keysym.sym == SDLK_1) {
+                } else if (event.key.keysym.sym == SDLK_1) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, blackColor);
-                }
-                if (event.key.keysym.sym == SDLK_2) {
+                } else if (event.key.keysym.sym == SDLK_2) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, whiteColor);
-                }
-                if (event.key.keysym.sym == SDLK_3) {
+                } else if (event.key.keysym.sym == SDLK_3) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, blueColor);
-                }
-                if (event.key.keysym.sym == SDLK_4) {
+                } else if (event.key.keysym.sym == SDLK_4) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, redColor);
-                }
-                if (event.key.keysym.sym == SDLK_5) {
+                } else if (event.key.keysym.sym == SDLK_5) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, greenColor);
-                }
-                if (event.key.keysym.sym == SDLK_6) {
+                } else if (event.key.keysym.sym == SDLK_6) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, grayColor);
-                }
-                if (event.key.keysym.sym == SDLK_7) {
+                } else if (event.key.keysym.sym == SDLK_7) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, cyanColor);
-                }
-                if (event.key.keysym.sym == SDLK_8) {
+                } else if (event.key.keysym.sym == SDLK_8) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, orangeColor);
-                }
-                if (event.key.keysym.sym == SDLK_9) {
+                } else if (event.key.keysym.sym == SDLK_9) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, purpleColor);
-                }
-                if (event.key.keysym.sym == SDLK_0) {
+                } else if (event.key.keysym.sym == SDLK_0) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, pinkColor);
+                } else if (event.key.keysym.sym == SDLK_UP) {
+                    model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
+                } else if (event.key.keysym.sym == SDLK_DOWN) {
+                    model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));
+                } else if (event.key.keysym.sym == SDLK_RIGHT) {
+                    rotationSpeed += 0.01f;
+                } else if (event.key.keysym.sym == SDLK_LEFT) {
+                    if (rotationSpeed != 0.0f) {
+                        rotationSpeed -= 0.01f;
+                    }
                 }
             }
         }
@@ -263,9 +262,10 @@ int main() {
         // Set up the model matrix and rotate the cube
         // Inside the main loop
         if (!pause) {
+            //Rotate the cube
             model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            std::cout << "Current shape color: R=" << shapeChosen[0] << " G=" << shapeChosen[1] << " B=" << shapeChosen[2] << " A=" << shapeChosen[3] << std::endl;
+            // std::cout << "Current shape color: R=" << shapeChosen[0] << " G=" << shapeChosen[1] << " B=" << shapeChosen[2] << " A=" << shapeChosen[3] << std::endl;
         }
 
         // Set the chosen color
