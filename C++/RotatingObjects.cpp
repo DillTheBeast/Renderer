@@ -41,7 +41,7 @@ const char* fragmentShaderSource = R"(
 
 //Global variables
 bool pause = false;
-bool shape = true;
+bool shape = false;
 bool background = false;
 float rotationSpeed = 0.02f;
 float blueColor[] = {0.0f, 0.0f, 1.0f, 1.0f};
@@ -58,7 +58,11 @@ float* backgroundChosen = blueColor; // Uses a pointer
 float* shapeChosen = greenColor; // Uses a pointer
 
 void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
-    shapeChosen = color;
+    if (background) {
+        backgroundChosen = color;
+    } else if (shape) {
+        shapeChosen = color;
+    }
 }
 
 int main() {
@@ -210,7 +214,14 @@ int main() {
                 }
 
                 // Handle color change keys
-
+                if (event.key.keysym.sym == SDLK_MINUS) {
+                    shape = true;
+                    background = false;
+                }
+                if (event.key.keysym.sym == SDLK_EQUALS) {
+                    background = true;
+                    shape = false;
+                }
                 if (event.key.keysym.sym == SDLK_1) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, blackColor);
                 }
