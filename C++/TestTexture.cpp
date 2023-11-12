@@ -1,4 +1,5 @@
 //COMPILE WITH: g++ -std=c++11 -o TestTexture TestTexture.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2 -framework OpenGL
+//COMPILE WITH: g++ -std=c++11 -o RotatingObjects RotatingObjects.cpp ./src/glad.c -I ./include/ -I /opt/homebrew/Cellar/glm/0.9.9.8/include/ -I /opt/homebrew/opt/sdl2/include -L /opt/homebrew/opt/sdl2/lib -lSDL2 -framework OpenGL
 #define STB_IMAGE_IMPLEMENTATION
 #include "./stb-master/stb_image.h"
 #include <SDL2/SDL.h>
@@ -13,39 +14,31 @@
 const char* vertexShaderSource = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
-    layout (location = 1) in vec4 aColor;
-    layout (location = 2) in vec2 aTexCoord;
-
-    out vec4 FragColor;
-    out vec2 TexCoord;
+    out vec4 FragColor; // Pass color to fragment shader
 
     uniform mat4 model;
     uniform mat4 view;
     uniform mat4 projection;
+    uniform vec4 shapeColor; // New uniform for shape color
 
     void main()
     {
         gl_Position = projection * view * model * vec4(aPos, 1.0f);
-        FragColor = aColor;
-        TexCoord = aTexCoord;
+        FragColor = shapeColor; // Use the uniform color for all vertices
     }
 )";
 
 // Fragment shader source code
 const char* fragmentShaderSource = R"(
     #version 330 core
-    in vec4 FragColor;
-    in vec2 TexCoord;
-
+    in vec4 FragColor; // Input color from vertex shader
     out vec4 FragColorOut;
-    
-    uniform sampler2D texture1;
-    // Add more texture samplers if you have multiple textures
 
     void main()
     {
-        FragColorOut = texture(texture1, TexCoord) * FragColor;
+        FragColorOut = FragColor; // Output the uniform color
     }
+
 )";
 
 //Global variables
@@ -70,26 +63,6 @@ float cubeCenterX = 0.0f;
 float cubeCenterY = 0.0f;
 float cubeCenterZ = 0.0f;
 
-glm::vec3 calculateCubeCenter(const glm::mat4& model) {
-    // The original vertices of the cube
-    glm::vec3 minVertex(-0.5f, -0.5f, -0.5f);
-    glm::vec3 maxVertex(0.5f, 0.5f, 0.5f);
-
-    // Transform the vertices by the model matrix
-    glm::vec4 minTransformed = model * glm::vec4(minVertex, 1.0f);
-    glm::vec4 maxTransformed = model * glm::vec4(maxVertex, 1.0f);
-
-    // Calculate the center point in world space
-    glm::vec3 center = 0.5f * glm::vec3(minTransformed + maxTransformed);
-
-    // Apply the position adjustments
-    center.x += cubeCenterX;
-    center.y += cubeCenterY;
-    center.z += cubeCenterZ;
-
-    return center;
-}
-
 void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
     if (background) {
         backgroundChosen = color;
@@ -99,6 +72,15 @@ void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& s
 }
 
 int main() {
+
+    int width, height, channels;
+    unsigned char* textureData = stbi_load("path/to/your/texture1.jpeg", &width, &height, &channels, 0);
+
+    if (!textureData) {
+        std::cerr << "Failed to load texture" << std::endl;
+        // Handle error (return or exit)
+    }
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
@@ -150,41 +132,15 @@ int main() {
 
     // Vertex data for the cube
     float vertices[] = {
-        // Front face
-        -0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-
-        // Back face
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-
-        // Right face
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-        // Left face
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-
-        // Top face
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-
-        // Bottom face
-        -0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    // Positions           // Colors
+        -0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        0.5f,  0.5f,  0.5f,     1.0f, 0.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f,   0.5f,    1.0f, 0.0f, 0.0f, 1.0f
     };
 
     // Indices for drawing the cube
@@ -203,9 +159,6 @@ int main() {
         7, 6, 2
     };
 
-    // Texture objects
-    unsigned int texture[6];
-
     // Vertex Array Object (VAO), Vertex Buffer Object (VBO), and Element Buffer Object (EBO) creation
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -219,27 +172,20 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    // Bind and fill the EBO with indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     // Set vertex attribute pointers
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     // Unbind VBO and VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    // Load texture images
-    int width, height, nrChannels;
-    unsigned char *textureData[6];
-    for (int i = 0; i < 6; ++i) {
-        textureData[i] = stbi_load(("path_to_texture_image" + std::to_string(i + 1) + ".jpg").c_str(), &width, &height, &nrChannels, 0);
-    }
-
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
