@@ -57,6 +57,30 @@ float orangeColor[] = {1.0f, 0.5f, 0.0f, 1.0f};
 float* backgroundChosen = blueColor; // Uses a pointer
 float* shapeChosen = greenColor; // Uses a pointer
 
+float cubeCenterX = 0.0f;
+float cubeCenterY = 0.0f;
+float cubeCenterZ = 0.0f;
+
+glm::vec3 calculateCubeCenter(const glm::mat4& model) {
+    // The original vertices of the cube
+    glm::vec3 minVertex(-0.5f, -0.5f, -0.5f);
+    glm::vec3 maxVertex(0.5f, 0.5f, 0.5f);
+
+    // Transform the vertices by the model matrix
+    glm::vec4 minTransformed = model * glm::vec4(minVertex, 1.0f);
+    glm::vec4 maxTransformed = model * glm::vec4(maxVertex, 1.0f);
+
+    // Calculate the center point in world space
+    glm::vec3 center = 0.5f * glm::vec3(minTransformed + maxTransformed);
+
+    // Apply the position adjustments
+    center.x += cubeCenterX;
+    center.y += cubeCenterY;
+    center.z += cubeCenterZ;
+
+    return center;
+}
+
 void colorCheck(bool background, bool shape, float*& backgroundChosen, float*& shapeChosen, float color[]) {
     if (background) {
         backgroundChosen = color;
@@ -240,16 +264,30 @@ int main() {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, purpleColor);
                 } else if (event.key.keysym.sym == SDLK_0) {
                     colorCheck(background, shape, backgroundChosen, shapeChosen, pinkColor);
-                } else if (event.key.keysym.sym == SDLK_UP) {
+                } 
+                //Handle the scale of the shape
+                else if (event.key.keysym.sym == SDLK_UP) {
                     model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
                 } else if (event.key.keysym.sym == SDLK_DOWN) {
                     model = glm::scale(model, glm::vec3(0.9f, 0.9f, 0.9f));
-                } else if (event.key.keysym.sym == SDLK_RIGHT) {
+                } 
+                //Handle the speed of the shape
+                else if (event.key.keysym.sym == SDLK_RIGHT) {
                     rotationSpeed += 0.01f;
                 } else if (event.key.keysym.sym == SDLK_LEFT) {
                     if (rotationSpeed != 0.0f) {
                         rotationSpeed -= 0.01f;
                     }
+                }
+                //Handle the positon of the shape
+                else if (event.key.keysym.sym == SDLK_w) {
+                    cubeCenterY += 0.1f;
+                } else if (event.key.keysym.sym == SDLK_s) {
+                    cubeCenterY -= 0.1f;
+                } else if (event.key.keysym.sym == SDLK_a) {
+                    cubeCenterX -= 0.1f;
+                } else if (event.key.keysym.sym == SDLK_d) {
+                    cubeCenterX += 0.1f;
                 }
             }
         }
@@ -266,6 +304,10 @@ int main() {
             model = glm::rotate(model, glm::radians(rotationSpeed), glm::vec3(0.5f, 1.0f, 0.0f));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             // std::cout << "Current shape color: R=" << shapeChosen[0] << " G=" << shapeChosen[1] << " B=" << shapeChosen[2] << " A=" << shapeChosen[3] << std::endl;
+
+            // Calculate and print the center coordinates
+            //glm::vec3 center = calculateCubeCenter(model);
+            //std::cout << "Center Coordinates: X=" << center.x << " Y=" << center.y << " Z=" << center.z << std::endl;
         }
 
         // Set the chosen color
