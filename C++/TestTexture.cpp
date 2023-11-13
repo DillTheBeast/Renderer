@@ -11,308 +11,111 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// Global Variables
-int gScreenWidth = 640;
-int gScreenHeight = 480;
-SDL_Window* gGraphicsAppWindow = nullptr;
-SDL_GLContext gOpenGLContext = nullptr;
-bool gQuit = false;
-GLuint gGraphicsPipelineShaderProgram = 0;
-GLuint gVertexArrayObject = 0;
-GLuint gVertexBufferObject = 0;
-GLuint gTextureID = 0;
-// Add these global matrices
-glm::mat4 modelMatrix = glm::mat4(1.0f);
-glm::mat4 viewMatrix = glm::lookAt(
-    glm::vec3(0.0f, 0.0f, 5.0f),
-    glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f)
-);
-glm::mat4 projectionMatrix = glm::perspective(glm::radians(60.0f), (float)gScreenWidth / (float)gScreenHeight, 0.1f, 100.0f);
-
-const std::string gVertexShaderSource = 
-    "#version 410 core\n"
-    "in vec4 position;\n"
-    "in vec2 texCoord;\n"
-    "out vec2 fragTexCoord;\n"
-    "uniform mat4 model;\n"
-    "uniform mat4 view;\n"
-    "uniform mat4 projection;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = projection * view * model * position;\n"
-    "   fragTexCoord = texCoord;\n"
-    "}\n";
-
-const std::string gFragmentShaderSource =
-    "#version 410 core\n"
-    "in vec2 fragTexCoord;\n"
-    "out vec4 color;\n"
-    "uniform sampler2D textureSampler;\n"
-    "void main()\n"
-    "{\n"
-    "   color = texture(textureSampler, fragTexCoord);\n"
-    "}\n";
-
-
-
-GLuint CompileShader(GLuint type, const std::string& source) {
-    GLuint shaderObject;
-
-    if(type == GL_VERTEX_SHADER) {
-        shaderObject = glCreateShader(GL_VERTEX_SHADER);
-    } else if(type == GL_FRAGMENT_SHADER) {
-        shaderObject = glCreateShader(GL_FRAGMENT_SHADER);
-    } 
-
-    const char* src = source.c_str();
-    glShaderSource(shaderObject, 1, &src, nullptr);
-    glCompileShader(shaderObject);
-
-    int result;
-    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &result);
-
-    if(result == GL_FALSE) {
-        int length;
-        glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &length);
-        char* errorMessage = new char[length];
-        glGetShaderInfoLog(shaderObject, length, &length, errorMessage);
-
-        if(type == GL_VERTEX_SHADER) {
-            std::cout << "ERROR: GL_VERTEX_SHADER compilation failed!\n" << errorMessage << "\n";
-        } else if (type == GL_FRAGMENT_SHADER) {
-            std::cout << "ERROR: GL_FRAGMENT_SHADER compilation failed!\n" << errorMessage << "\n";
-        }
-        delete[] errorMessage;
-        glDeleteShader(shaderObject);
-        return 0;
-    }
-
-    return shaderObject;
+// Function to initialize SDL and create a window
+SDL_Window* initSDL(int width, int height) {
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window* window = SDL_CreateWindow("3D Cube", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+    return window;
 }
 
-GLuint CreateShaderProgram(const std::string& vertexShader, const std::string& fragmentShader) {
-    GLuint programObject = glCreateProgram();
-
-    GLuint myVertexShader = CompileShader(GL_VERTEX_SHADER, vertexShader);
-    GLuint myFragmentShader = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-
-    glAttachShader(programObject, myVertexShader);
-    glAttachShader(programObject, myFragmentShader);
-    glLinkProgram(programObject);
-
-    // Validate our program
-    glValidateProgram(programObject);
-    // glDetachShader, glDeleteShader
-    glDetachShader(programObject, myVertexShader);
-    glDetachShader(programObject, myFragmentShader);
-
-    glDeleteShader(myVertexShader);
-    glDeleteShader(myFragmentShader);
-
-    return programObject;
+// Function to initialize OpenGL using GLAD
+void initOpenGL() {
+    gladLoadGL();
+    glEnable(GL_DEPTH_TEST);
 }
 
-void CreateGraphicsPipeline() {
-    gGraphicsPipelineShaderProgram = CreateShaderProgram(gVertexShaderSource, gFragmentShaderSource);
-
-    // Set the texture sampler uniform location
-    GLint textureLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "textureSampler");
-    glUniform1i(textureLocation, 0);
-}
-
-void GetOpenGLVersionInfo() {
-    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "Version: " << glGetString(GL_VERSION ) << std::endl;
-    std::cout << "Shading Language: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-}
-
-void VertexSpecification() {
-    const std::vector<GLfloat> vertexPositions {
-        // Triangle 1 (front)
-        -1.0f, -1.0f, 1.0f,
-         1.0f, -1.0f, 1.0f,
-         0.0f,  1.0f, 0.0f,
-
-        // Triangle 2 (right)
-         1.0f, -1.0f, 1.0f,
-         1.0f, -1.0f, -1.0f,
-         0.0f,  1.0f, 0.0f,
-
-        // Triangle 3 (left)
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         0.0f,  1.0f, 0.0f,
+// Function to create a simple cube
+void createCube() {
+    float vertices[] = {
+        // Front face
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        
+        // Back face
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f
     };
 
-    const std::vector<GLfloat> textureCoordinates {
-        0.0f, 0.0f,  // Left Vertex
-        1.0f, 0.0f,  // Right Vertex
-        0.5f, 1.0f,  // Top Vertex
-        0.0f, 0.0f,  // Left Vertex
-        1.0f, 0.0f,  // Right Vertex
-        0.5f, 1.0f,  // Top Vertex
-        0.0f, 0.0f,  // Left Vertex
-        1.0f, 0.0f,  // Right Vertex
-        0.5f, 1.0f   // Top Vertex
+    unsigned int indices[] = {
+        0, 1, 2,  // Front
+        2, 3, 0,
+        4, 5, 6,  // Back
+        6, 7, 4,
+        0, 3, 7,  // Left
+        7, 4, 0,
+        1, 2, 6,  // Right
+        6, 5, 1,
+        3, 2, 6,  // Top
+        6, 7, 3,
+        0, 1, 5,  // Bottom
+        5, 4, 0
     };
 
-    glGenVertexArrays(1, &gVertexArrayObject);
-    glBindVertexArray(gVertexArrayObject);
+    unsigned int VBO, VAO, EBO;
 
-    glGenBuffers(1, &gVertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, vertexPositions.size() * sizeof(GLfloat), vertexPositions.data(), GL_STATIC_DRAW);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
-    // Texture attribute
-    glGenBuffers(1, &gVertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, textureCoordinates.size() * sizeof(GLfloat), textureCoordinates.data(), GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-}
 
+    // Render the cube
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
-GLuint LoadTexture(const char* texturePath) {
-    int width, height, numChannels;
-    unsigned char* image = stbi_load(texturePath, &width, &height, &numChannels, 0);
-
-    if (!image) {
-        std::cerr << "Failed to load texture: " << texturePath << std::endl;
-        exit(1);
-    }
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-
-    // Set texture parameters (optional)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_image_free(image);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    return texture;
-}
-
-void InitializeProgram() {
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cout << "SDL2 could not initialize! SDL Error: " << SDL_GetError() << "\n";
-        exit(1);
-    }
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    gGraphicsAppWindow = SDL_CreateWindow("Renderer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gScreenWidth, gScreenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-
-    if(gGraphicsAppWindow == nullptr) {
-        std::cout << "SDL Window was not able to be created! SDL Error: " << SDL_GetError() << "\n";
-        exit(1);
-    }
-
-    gOpenGLContext = SDL_GL_CreateContext(gGraphicsAppWindow);
-
-    if(gOpenGLContext == nullptr) {
-        std::cout << "OpenGL context could not be created! SDL Error: " << SDL_GetError() << "\n";
-        exit(1);
-    }
-
-    if (!gladLoadGLLoader(SDL_GL_GetProcAddress)) {
-        std::cout << "GLAD failed to initialize!" << std::endl;
-        exit(1);
-    }
-}
-
-void Input() {
-    SDL_Event e;
-
-    while(SDL_PollEvent(&e) != 0) {
-        if(e.type == SDL_QUIT) {
-            std::cout << "See ya" << std::endl;
-            gQuit = true;
-        } else if(e.type == SDL_KEYDOWN) {
-            if(e.key.keysym.sym == SDLK_ESCAPE) {
-                std::cout << "See ya" << std::endl;
-                gQuit = true;
-            }
-        }
-    }
-}
-
-void PreDraw() {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    glViewport(0, 0, gScreenWidth, gScreenHeight);
-    glClearColor(1.f, 1.f, 0.f, 1.f);
-
-    glUseProgram(gGraphicsPipelineShaderProgram);
-
-    // Set matrix uniforms
-    GLint modelLoc = glGetUniformLocation(gGraphicsPipelineShaderProgram, "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-    GLint viewLoc = glGetUniformLocation(gGraphicsPipelineShaderProgram, "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-    GLint projectionLoc = glGetUniformLocation(gGraphicsPipelineShaderProgram, "projection");
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-}
-
-void Draw() {
-    glBindVertexArray(gVertexArrayObject);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gTextureID);
-
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-void MainLoop() {
-    while(!gQuit) {
-        Input();
-
-        // Rotate the entire scene (camera)
-        viewMatrix = glm::rotate(viewMatrix, glm::radians(0.02f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        PreDraw();
-        Draw();
-        SDL_GL_SwapWindow(gGraphicsAppWindow);
-    }
-}
-
-void CleanUp() {
-    SDL_DestroyWindow(gGraphicsAppWindow);
-    SDL_Quit();
+    // Clean up
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 }
 
 int main() {
-    InitializeProgram();
-    VertexSpecification();
-    CreateGraphicsPipeline();
+    // Set up SDL and OpenGL
+    SDL_Window* window = initSDL(800, 600);
+    initOpenGL();
 
-    gTextureID = LoadTexture("/Users/dillonmaltese/Documents/GitHub/Renderer/C++/texture1.jpeg");
+    // Main loop
+    bool quit = false;
+    while (!quit) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT)
+                quit = true;
+        }
 
-    MainLoop();
-    CleanUp();
+        // Set background color
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Draw the cube
+        createCube();
+
+        // Swap buffers
+        SDL_GL_SwapWindow(window);
+    }
+
+    // Clean up
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     return 0;
 }
