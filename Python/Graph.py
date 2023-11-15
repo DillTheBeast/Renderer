@@ -38,6 +38,7 @@ def findPoints():
     
 
 running = True
+findPoints()
 while running:
     for event in pygame.event.get():
         # Checking what key is pressed and then executing specific action
@@ -49,7 +50,7 @@ while running:
 
     screen.fill(BLACK)
     drawGrid()
-    # pygame.draw.circle(screen, WHITE, (int(points[0][0]), int(points[0][1])), 5)
+    pygame.draw.circle(screen, WHITE, (int(points[0][0]), int(points[0][1])), 5)
     # pygame.draw.circle(screen, WHITE, (int(points[1][0]), int(points[1][1])), 5)
     # connectPoints(0, 1, points)  # Connect the two points
     pygame.display.flip()
