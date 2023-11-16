@@ -30,9 +30,9 @@ def drawGrid():
 
 def findPoints():
     print("Use the line equation y = mx + b")
-    negChoice = int(input("If m is a negative number press 1. Otherwise click any other number"))
-    mNum = int(input("What is m's numerator: "))
-    mDen = int(input("What is m's denominator: "))
+    negChoice = int(input("If m is a negative number press 1. Otherwise click any other number\n"))
+    mNum = int(input("What is m's numerator:\n"))
+    mDen = int(input("What is m's denominator:\n"))
     b = int(input("What is b: "))
     points.append((0, b))
     
