@@ -6,62 +6,42 @@ pygame.init()
 WIDTH, HEIGHT = 1400, 800
 pygame.display.set_caption("Graph")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-font = pygame.font.Font(None, 36)
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 points = []
+# points.append(np.array([50, 50]))
+# points.append(np.array([150, 50]))
 
 def connectPoints(i, j, points):
     pygame.draw.line(screen, BLUE, (points[i][0], points[i][1]), (points[j][0], points[j][1]), 3)
 
 def drawGrid():
     pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
-    x = 0  
-    y = 0 
-    for i in range((1400 // 50) + 1):  
-        x += 50  
+    x = 0  # Start from 0
+    y = 0 # Start from 0
+    for i in range((1400 // 50) + 1):  # Loop 1400 / 50 times
+        x += 50  # Add 50 to x for the next line
         pygame.draw.line(screen, WHITE, (x, 0), (x, HEIGHT))
     for i in range((800 // 50) + 1):
         y += 50
         pygame.draw.line(screen, WHITE, (0, y), (WIDTH, y))
-
-def inputText(display_text, initial_value=""):
-    input_window = pygame.display.set_mode((400, 100))
-    pygame.display.set_caption("Text Input")
-    user_text = initial_value
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    return user_text
-                elif event.key == pygame.K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
-
-        input_window.fill(BLACK)
-        text_surface = font.render(display_text + user_text, True, WHITE)
-        input_window.blit(text_surface, (10, 10))
-        pygame.display.flip()
+        
 
 def findPoints():
     print("Use the line equation y = mx + b")
-    neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number"))
-    m_num = int(inputText("What is m's numerator: "))
-    m_den = int(inputText("What is m's denominator: "))
-    b = int(inputText("What is b: "))
-    points.append((WIDTH/2, b))
+    negChoice = int(input("If m is a negative number press 1. Otherwise click any other number"))
+    mNum = int(input("What is m's numerator: "))
+    mDen = int(input("What is m's denominator: "))
+    b = int(input("What is b: "))
+    points.append((0, b))
+    
 
 running = True
-findPoints()
+findPoints
 while running:
     for event in pygame.event.get():
+        # Checking what key is pressed and then executing specific action
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
@@ -70,7 +50,9 @@ while running:
 
     screen.fill(BLACK)
     drawGrid()
-    pygame.draw.circle(screen, WHITE, (int(points[0][0]), int(points[0][1])), 5)
+    # pygame.draw.circle(screen, WHITE, (int(points[0][0]), int(points[0][1])), 5)
+    # pygame.draw.circle(screen, WHITE, (int(points[1][0]), int(points[1][1])), 5)
+    # connectPoints(0, 1, points)  # Connect the two points
     pygame.display.flip()
 
 pygame.quit()
