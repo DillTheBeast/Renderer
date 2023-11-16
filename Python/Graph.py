@@ -28,32 +28,27 @@ def drawGrid():
         pygame.draw.line(screen, WHITE, (0, y), (WIDTH, y))
 
 def inputText(display_text, initial_value=""):
+    input_window = pygame.display.set_mode((400, 100))
+    pygame.display.set_caption("Text Input")
     user_text = initial_value
-    text_surface = font.render(display_text + user_text, True, WHITE)
-    input_rect = text_surface.get_rect(bottomleft=(10, HEIGHT - 40))
 
-    active = True
-
-    while active:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    active = False
+                    return user_text
                 elif event.key == pygame.K_BACKSPACE:
                     user_text = user_text[:-1]
                 else:
                     user_text += event.unicode
-                text_surface = font.render(display_text + user_text, True, WHITE)
 
-        screen.fill(BLACK)
-        drawGrid()
-        screen.blit(text_surface, input_rect)
+        input_window.fill(BLACK)
+        text_surface = font.render(display_text + user_text, True, WHITE)
+        input_window.blit(text_surface, (10, 10))
         pygame.display.flip()
-
-    return user_text
 
 def findPoints():
     print("Use the line equation y = mx + b")
