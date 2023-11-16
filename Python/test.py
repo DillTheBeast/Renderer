@@ -30,5 +30,9 @@ while True:
     window1.fill(white)
     window2.fill(white)
 
-    # Update the display
-    pygame.display.flip()
+    # Update the display for each window
+    pygame.display.update()
+
+# Note: This code will still not behave exactly as expected. 
+# Pygame allows only one window at a time to have focus, 
+# so you may need to handle user input differently for each window.
