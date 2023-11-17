@@ -80,44 +80,34 @@ def findPoints():
     mNum = int(inputText("What is m's numerator: \n"))
     mDen = int(inputText("What is m's denominator: \n"))
     bAns = int(inputText("What is b: \n"))
-
     bP = 0
-    mNumP1 = HEIGHT / 2 - bP
-    mNumP2 = HEIGHT / 2 + bP
+    mNumP3 = 0
+    mNumP4 = 0
     mDenP1 = 0
     mDenP2 = 0
-
+    mDenP3 = 0
+    mDenP4 = 0
     for i in range(bAns):
         bP += 50
-    points.append((0, HEIGHT / 2 - bP))  # Adjusted to go through (0, b)
-
+    mNumP1 = HEIGHT/2 - bP
+    mNumP2 = HEIGHT/2 - bP
+    points.append((WIDTH/2, HEIGHT/2 - bP))
     for i in range(mNum):
         mNumP1 -= 50
         mNumP2 += 50
-
     for i in range(mDen):
         mDenP1 += 50
         mDenP2 -= 50
-
-    points.append((WIDTH, HEIGHT / 2 + bP))  # Adjusted to go through (0, b)
-
-    mNumP3 = HEIGHT / 2 - bP
-    mNumP4 = HEIGHT / 2 + bP
-    mDenP3 = 0
-    mDenP4 = 0
-
     for i in range(mNum * 500):
-        mNumP3 -= 50
-        mNumP4 += 50
-
-    for i in range(mDen * 500):
         mDenP3 += 50
         mDenP4 -= 50
-
-    points.append((WIDTH / 2 + mDenP3, mNumP3))
-    points.append((WIDTH / 2 + mDenP4, mNumP4))
-
-
+    for i in range(mDen * 500):
+        mNumP3 -= 50
+        mNumP4 += 50
+    points.append((WIDTH/2 + mDenP1, mNumP1))
+    points.append((WIDTH/2 + mDenP2, mNumP2))
+    points.append((WIDTH/2 + mDenP3, mNumP3))
+    points.append((WIDTH/2 + mDenP4, mNumP4))
 
 running = True
 findPoints()
@@ -133,7 +123,10 @@ while running:
     drawGrid()
     pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
     pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
-    connectPoints(2, 3, points)
+    pygame.draw.circle(screen, BLUE, (int(points[2][0]), int(points[2][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[3][0]), int(points[3][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[4][0]), int(points[4][1])), 8)
+    connectPoints(3, 4, points)
     pygame.display.flip()
 
 pygame.quit()
