@@ -37,10 +37,14 @@ def findPoints():
 
 def processInput():
     global input_text, points
-    # Process the input and update the points list
-    # You need to implement this part based on your requirements
-    # For example, you can parse the input_text and update points accordingly
-    pass
+    try:
+        # Parse the input_text and add a point to the points list
+        m = int(input_text)
+        b = int(input("What is b: "))
+        points.append((m, b))
+        print(f"Added point: ({m}, {b})")
+    except ValueError:
+        print("Invalid input. Please enter an integer for m and b.")
 
 def displayText(text, position):
     text_surface = font.render(text, True, WHITE)
@@ -58,10 +62,7 @@ while running:
                 running = False
             elif event.key == pygame.K_RETURN:
                 # Process the input when Enter is pressed
-                try:
-                    processInput()
-                except ValueError:
-                    print("Invalid input. Please try again.")
+                processInput()
                 input_text = ""
             elif event.key == pygame.K_BACKSPACE:
                 # Handle backspace to delete characters
@@ -73,8 +74,8 @@ while running:
     screen.fill(BLACK)
     drawGrid()
 
-    if points:  # Check if the points list is not empty
-        pygame.draw.circle(screen, WHITE, (int(points[0][0]), int(points[0][1])), 5)
+    for point in points:
+        pygame.draw.circle(screen, WHITE, (int(point[0]), int(point[1])), 5)
 
     displayText("Press ESC to exit", (10, HEIGHT - 40))
     findPoints()
