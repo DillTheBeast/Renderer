@@ -79,11 +79,11 @@ def findPoints():
     neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
     m_num = int(inputText("What is m's numerator: \n"))
     m_den = int(inputText("What is m's denominator: \n"))
-    b = int(inputText("What is b: \n"))
-    b1 = 0
-    for i in range(b):
-        b1 += 50
-    points.append((WIDTH/2, HEIGHT/2 - b1))
+    bAns = int(inputText("What is b: \n"))
+    bP = 0
+    for i in range(bAns):
+        bP += 50
+    points.append((WIDTH/2, HEIGHT/2 - bP))
 
 running = True
 findPoints()
