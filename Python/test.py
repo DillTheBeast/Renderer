@@ -81,8 +81,6 @@ def findPoints():
     mDen = int(inputText("What is m's denominator: \n"))
     bAns = int(inputText("What is b: \n"))
     bP = 0
-    mNumP3 = 0
-    mNumP4 = 0
     mDenP1 = 0
     mDenP2 = 0
     mDenP3 = 0
@@ -91,6 +89,8 @@ def findPoints():
         bP += 50
     mNumP1 = HEIGHT/2 - bP
     mNumP2 = HEIGHT/2 - bP
+    mNumP3 = HEIGHT/2 - bP
+    mNumP4 = HEIGHT/2 - bP
     points.append((WIDTH/2, HEIGHT/2 - bP))
     for i in range(mNum):
         mNumP1 -= 50
@@ -98,10 +98,10 @@ def findPoints():
     for i in range(mDen):
         mDenP1 += 50
         mDenP2 -= 50
-    for i in range(mNum * 500):
+    for i in range(mNum * 50):
         mDenP3 += 50
         mDenP4 -= 50
-    for i in range(mDen * 500):
+    for i in range(mDen * 50):
         mNumP3 -= 50
         mNumP4 += 50
     points.append((WIDTH/2 + mDenP1, mNumP1))
