@@ -77,13 +77,20 @@ def inputText(display_text, initial_value=""):
 def findPoints():
     print("Use the line equation y = mx + b")
     neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
-    m_num = int(inputText("What is m's numerator: \n"))
-    m_den = int(inputText("What is m's denominator: \n"))
+    mNum = int(inputText("What is m's numerator: \n"))
+    mDen = int(inputText("What is m's denominator: \n"))
     bAns = int(inputText("What is b: \n"))
     bP = 0
+    mDenP = 0
     for i in range(bAns):
         bP += 50
     points.append((WIDTH/2, HEIGHT/2 - bP))
+    mNumP = HEIGHT/2 - bP
+    for i in range(mNum):
+        mNumP -= 50
+    for i in range(mDen):
+        mDenP += 50
+    points.append((WIDTH/2 + mDenP, mNumP))
 
 running = True
 findPoints()
@@ -98,6 +105,8 @@ while running:
     screen.fill(BLACK)
     drawGrid()
     pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
+    connectPoints(0, 1, points)
     pygame.display.flip()
 
 pygame.quit()

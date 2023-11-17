@@ -10,7 +10,7 @@ font = pygame.font.Font(None, 36)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
+BLUE = (50, 120, 255)
 points = []
 
 def connectPoints(i, j, points):
@@ -77,13 +77,47 @@ def inputText(display_text, initial_value=""):
 def findPoints():
     print("Use the line equation y = mx + b")
     neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
-    m_num = int(inputText("What is m's numerator: \n"))
-    m_den = int(inputText("What is m's denominator: \n"))
-    b = int(inputText("What is b: \n"))
-    b1 = 0
-    for i in range(b):
-        b1 += 50
-    points.append((WIDTH/2, b1))
+    mNum = int(inputText("What is m's numerator: \n"))
+    mDen = int(inputText("What is m's denominator: \n"))
+    bAns = int(inputText("What is b: \n"))
+
+    bP = 0
+    mNumP1 = HEIGHT / 2 - bP
+    mNumP2 = HEIGHT / 2 + bP
+    mDenP1 = 0
+    mDenP2 = 0
+
+    for i in range(bAns):
+        bP += 50
+    points.append((0, HEIGHT / 2 - bP))  # Adjusted to go through (0, b)
+
+    for i in range(mNum):
+        mNumP1 -= 50
+        mNumP2 += 50
+
+    for i in range(mDen):
+        mDenP1 += 50
+        mDenP2 -= 50
+
+    points.append((WIDTH, HEIGHT / 2 + bP))  # Adjusted to go through (0, b)
+
+    mNumP3 = HEIGHT / 2 - bP
+    mNumP4 = HEIGHT / 2 + bP
+    mDenP3 = 0
+    mDenP4 = 0
+
+    for i in range(mNum * 500):
+        mNumP3 -= 50
+        mNumP4 += 50
+
+    for i in range(mDen * 500):
+        mDenP3 += 50
+        mDenP4 -= 50
+
+    points.append((WIDTH / 2 + mDenP3, mNumP3))
+    points.append((WIDTH / 2 + mDenP4, mNumP4))
+
+
 
 running = True
 findPoints()
@@ -97,7 +131,9 @@ while running:
 
     screen.fill(BLACK)
     drawGrid()
-    pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 5)
+    pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
+    connectPoints(2, 3, points)
     pygame.display.flip()
 
 pygame.quit()
