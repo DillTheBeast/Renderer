@@ -7,52 +7,86 @@ WIDTH, HEIGHT = 1400, 800
 pygame.display.set_caption("Graph")
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 font = pygame.font.Font(None, 36)
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 points = []
-
-input_text = ""
 
 def connectPoints(i, j, points):
     pygame.draw.line(screen, BLUE, (points[i][0], points[i][1]), (points[j][0], points[j][1]), 3)
 
 def drawGrid():
     pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
-    x = 0
-    y = 0
-    for i in range((WIDTH // 50) + 1):
-        x += 50
+    x = 0  
+    y = 0 
+    for i in range((1400 // 50) + 1):  
+        x += 50  
         pygame.draw.line(screen, WHITE, (x, 0), (x, HEIGHT))
-    for i in range((HEIGHT // 50) + 1):
+    for i in range((800 // 50) + 1):
         y += 50
         pygame.draw.line(screen, WHITE, (0, y), (WIDTH, y))
 
+def wrap_text(text, font, max_width):
+    lines = []
+    words = text.split()
+    current_line = words[0]
+
+    for word in words[1:]:
+        test_line = current_line + " " + word
+        test_width, _ = font.size(test_line)
+        if test_width <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+
+    lines.append(current_line)
+    return lines
+
+def inputText(display_text, initial_value=""):
+    input_window = pygame.display.set_mode((1400, 800))
+    pygame.display.set_caption("Text Input")
+    user_text = initial_value
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return user_text
+                elif event.key == pygame.K_BACKSPACE:
+                    user_text = user_text[:-1]
+                else:
+                    user_text += event.unicode
+
+        input_window.fill(BLACK)  # Clear the window each frame
+
+        # Wrap the text to a new line if it exceeds the width
+        wrapped_lines = wrap_text(display_text + user_text, font, WIDTH - 20)
+
+        # Draw the wrapped lines
+        for i, line in enumerate(wrapped_lines):
+            text_surface = font.render(line, True, WHITE)
+            input_window.blit(text_surface, (10, 10 + i * font.get_linesize()))
+
+        pygame.display.flip()
+
 def findPoints():
-    global input_text
-    displayText("Use the line equation y = mx + b", (10, 10))
-    displayText("If m is a negative number, press 1. Otherwise, press any other number", (10, 50))
-    displayText("Press Enter to submit", (10, 90))
-    displayText("Input: " + input_text, (10, 130))
-
-def processInput():
-    global input_text, points
-    try:
-        # Parse the input_text and add a point to the points list
-        m = int(input_text)
-        b = int(input("What is b: "))
-        points.append((m, b))
-        print(f"Added point: ({m}, {b})")
-    except ValueError:
-        print("Invalid input. Please enter an integer for m and b.")
-
-def displayText(text, position):
-    text_surface = font.render(text, True, WHITE)
-    screen.blit(text_surface, position)
+    print("Use the line equation y = mx + b")
+    neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
+    m_num = int(inputText("What is m's numerator: \n"))
+    m_den = int(inputText("What is m's denominator: \n"))
+    b = int(inputText("What is b: \n"))
+    b1 = 0
+    for i in range(b):
+        b1 += 50
+    points.append((WIDTH/2, b1))
 
 running = True
 findPoints()
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -60,25 +94,10 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
-            elif event.key == pygame.K_RETURN:
-                # Process the input when Enter is pressed
-                processInput()
-                input_text = ""
-            elif event.key == pygame.K_BACKSPACE:
-                # Handle backspace to delete characters
-                input_text = input_text[:-1]
-            else:
-                # Add the pressed key to the input text
-                input_text += event.unicode
 
     screen.fill(BLACK)
     drawGrid()
-
-    for point in points:
-        pygame.draw.circle(screen, WHITE, (int(point[0]), int(point[1])), 5)
-
-    displayText("Press ESC to exit", (10, HEIGHT - 40))
-    findPoints()
+    pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 5)
     pygame.display.flip()
 
 pygame.quit()
