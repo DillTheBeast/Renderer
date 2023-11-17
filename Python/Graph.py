@@ -83,7 +83,7 @@ def findPoints():
     b1 = 0
     for i in range(b):
         b1 += 50
-    points.append((WIDTH/2, b1))
+    points.append((WIDTH/2, HEIGHT/2 - b1))
 
 running = True
 findPoints()
