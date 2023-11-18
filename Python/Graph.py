@@ -11,14 +11,15 @@ font = pygame.font.Font(None, 36)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (50, 120, 255)
+IDK = (255, 120, 50)
 points = []
 
-def connectPoints(i, j, points):
+def connectPoints(i, j, points, COLOR):
     x1, y1 = points[i]
     x2, y2 = points[j]
 
     # Draw the line within the screen
-    pygame.draw.line(screen, BLUE, (x1, y1), (x2, y2), 3)
+    pygame.draw.line(screen, COLOR, (x1, y1), (x2, y2), 3)
 
     # Calculate the slope and y-intercept
     m = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
@@ -31,7 +32,7 @@ def connectPoints(i, j, points):
     extended_y2 = m * extended_x2 + b
 
     # Draw the extended line
-    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
+    pygame.draw.line(screen, COLOR, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
 
 def drawGrid():
     pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
@@ -125,8 +126,8 @@ def findPoints():
 
 
 running = True
-findPoints()
-findPoints()
+for i in range(2):
+    findPoints()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -137,18 +138,11 @@ while running:
 
     screen.fill(BLACK)
     drawGrid()
-    pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[2][0]), int(points[2][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[3][0]), int(points[3][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[4][0]), int(points[4][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[5][0]), int(points[5][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[6][0]), int(points[6][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[7][0]), int(points[7][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[8][0]), int(points[8][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[9][0]), int(points[9][1])), 8)
-    connectPoints(3, 4, points)
-    connectPoints(8, 9, points)
+    for i in range(9):
+        if i > 4: pygame.draw.circle(screen, BLUE, (int(points[i][0]), int(points[i][1])), 8)
+        else: pygame.draw.circle(screen, IDK, (int(points[i][0]), int(points[i][1])), 8)
+    connectPoints(3, 4, points, IDK)
+    connectPoints(8, 9, points, BLUE)
     pygame.display.flip()
 
 
