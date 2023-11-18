@@ -14,7 +14,28 @@ BLUE = (50, 120, 255)
 points = []
 
 def connectPoints(i, j, points):
-    pygame.draw.line(screen, BLUE, (points[i][0], points[i][1]), (points[j][0], points[j][1]), 3)
+    x1, y1 = points[i]
+    x2, y2 = points[j]
+
+    # Draw the line within the screen
+    pygame.draw.line(screen, BLUE, (x1, y1), (x2, y2), 3)
+
+    # Calculate the slope and y-intercept
+    m = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
+    b = y1 - m * x1
+
+    # Calculate the extended line points
+    extended_x1 = -WIDTH
+    extended_y1 = m * extended_x1 + b
+    extended_x2 = 2 * WIDTH
+    extended_y2 = m * extended_x2 + b
+
+    # Draw the extended line
+    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
+
+
+    # Draw the extended line
+    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
 
 def drawGrid():
     pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
@@ -95,19 +116,18 @@ def findPoints():
     for i in range(mNum):
         mNumP1 -= 50
         mNumP2 += 50
+        mNumP3 -= 50  # Corrected
+        mNumP4 += 50  # Corrected
     for i in range(mDen):
         mDenP1 += 50
         mDenP2 -= 50
-    for i in range(mNum * 50):
-        mDenP3 += 50
-        mDenP4 -= 50
-    for i in range(mDen * 50):
-        mNumP3 -= 50
-        mNumP4 += 50
+        mDenP3 += 50  # Corrected
+        mDenP4 -= 50  # Corrected
     points.append((WIDTH/2 + mDenP1, mNumP1))
     points.append((WIDTH/2 + mDenP2, mNumP2))
     points.append((WIDTH/2 + mDenP3, mNumP3))
     points.append((WIDTH/2 + mDenP4, mNumP4))
+
 
 running = True
 findPoints()
@@ -128,5 +148,6 @@ while running:
     pygame.draw.circle(screen, BLUE, (int(points[4][0]), int(points[4][1])), 8)
     connectPoints(3, 4, points)
     pygame.display.flip()
+
 
 pygame.quit()
