@@ -14,7 +14,24 @@ BLUE = (50, 120, 255)
 points = []
 
 def connectPoints(i, j, points):
-    pygame.draw.line(screen, BLUE, (points[i][0], points[i][1]), (points[j][0], points[j][1]), 3)
+    x1, y1 = points[i]
+    x2, y2 = points[j]
+
+    # Draw the line within the screen
+    pygame.draw.line(screen, BLUE, (x1, y1), (x2, y2), 3)
+
+    # Calculate the slope and y-intercept
+    m = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
+    b = y1 - m * x1
+
+    # Calculate the extended line points
+    extended_x1 = -WIDTH
+    extended_y1 = m * extended_x1 + b
+    extended_x2 = 2 * WIDTH
+    extended_y2 = m * extended_x2 + b
+
+    # Draw the extended line
+    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
 
 def drawGrid():
     pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
@@ -75,24 +92,40 @@ def inputText(display_text, initial_value=""):
         pygame.display.flip()
 
 def findPoints():
-    print("Use the line equation y = mx + b")
     neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
     mNum = int(inputText("What is m's numerator: \n"))
     mDen = int(inputText("What is m's denominator: \n"))
     bAns = int(inputText("What is b: \n"))
     bP = 0
-    mDenP = 0
+    mDenP1 = 0
+    mDenP2 = 0
+    mDenP3 = 0
+    mDenP4 = 0
     for i in range(bAns):
         bP += 50
+    mNumP1 = HEIGHT/2 - bP
+    mNumP2 = HEIGHT/2 - bP
+    mNumP3 = HEIGHT/2 - bP
+    mNumP4 = HEIGHT/2 - bP
     points.append((WIDTH/2, HEIGHT/2 - bP))
-    mNumP = HEIGHT/2 - bP
     for i in range(mNum):
-        mNumP -= 50
+        mNumP1 -= 50
+        mNumP2 += 50
+        mNumP3 -= 50  # Corrected
+        mNumP4 += 50  # Corrected
     for i in range(mDen):
-        mDenP += 50
-    points.append((WIDTH/2 + mDenP, mNumP))
+        mDenP1 += 50
+        mDenP2 -= 50
+        mDenP3 += 50  # Corrected
+        mDenP4 -= 50  # Corrected
+    points.append((WIDTH/2 + mDenP1, mNumP1))
+    points.append((WIDTH/2 + mDenP2, mNumP2))
+    points.append((WIDTH/2 + mDenP3, mNumP3))
+    points.append((WIDTH/2 + mDenP4, mNumP4))
+
 
 running = True
+findPoints()
 findPoints()
 while running:
     for event in pygame.event.get():
@@ -106,7 +139,17 @@ while running:
     drawGrid()
     pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
     pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
-    connectPoints(0, 1, points)
+    pygame.draw.circle(screen, BLUE, (int(points[2][0]), int(points[2][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[3][0]), int(points[3][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[4][0]), int(points[4][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[5][0]), int(points[5][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[6][0]), int(points[6][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[7][0]), int(points[7][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[8][0]), int(points[8][1])), 8)
+    pygame.draw.circle(screen, BLUE, (int(points[9][0]), int(points[9][1])), 8)
+    connectPoints(3, 4, points)
+    connectPoints(8, 9, points)
     pygame.display.flip()
+
 
 pygame.quit()
