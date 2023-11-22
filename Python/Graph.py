@@ -1,7 +1,6 @@
 import pygame
 import numpy as np
 
-#Test
 pygame.init()
 
 #Defining pygame needed variables
