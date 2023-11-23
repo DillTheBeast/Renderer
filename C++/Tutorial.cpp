@@ -4,26 +4,42 @@
 #include <iostream>
 
 int main() {
-    glfwInit();
+    // Initialize GLFW
+    if (!glfwInit()) {
+        std::cout << "Failed to initialize GLFW" << std::endl;
+        return -1;
+    }
 
-    //Telling code version of glfw being used
+    // Telling code version of GLFW being used
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //Data type of window object          Width, Height, Name, Fullscreen?, Not Important 
+    // Create a GLFW window
     GLFWwindow* window = glfwCreateWindow(800, 800, "Renderer", NULL, NULL);
-    if(window == NULL) {
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
+
+    // Make the OpenGL context of the window current
     glfwMakeContextCurrent(window);
 
-    while(!glfwWindowShouldClose(window)) {
+    // Initialize GLAD
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+
+    // Main loop
+    while (!glfwWindowShouldClose(window)) {
+        // Process events
         glfwPollEvents();
     }
 
+    // Cleanup and terminate GLFW
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
