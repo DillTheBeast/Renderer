@@ -1,0 +1,47 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineSystem.cmake:211 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The system is: Darwin - 23.1.0 - arm64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/private/var/folders/92/4hb_cgf11kd8v1vd599v__2m0000gn/T/AppTranslocation/5D5053C6-DA82-4EA6-A33B-66CCCCF15D97/d/CMake.app/Contents/share/cmake-3.27/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+      Compiler:  
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
+      
+      
+...
