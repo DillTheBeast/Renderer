@@ -59,7 +59,7 @@ int main() {
     // Print the OpenGL version
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
-    Shader shaderProgram("default.vert", "default.frag"); 
+    Shader shaderProgram("Shaders/default.vert", "Shaders/default.frag"); 
 
     VAO VAO1;
     VAO1.Bind();

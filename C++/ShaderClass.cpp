@@ -1,43 +1,18 @@
 #include "ShaderClass.h"
-#include <fstream>
-#include <iostream>
 
 std::string get_file_contents(const char* filename) {
-    // Open the file
     std::ifstream in(filename, std::ios::binary);
-    if (!in.is_open()) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        throw(errno);
+    if(in) {
+        std::string contents;
+        in.seekg(0, std::ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+        return (contents);
     }
-
-    // Seek to the end to get the file size
-    in.seekg(0, std::ios::end);
-    std::streamsize size = in.tellg();
-
-    // Check if the file is empty
-    if (size <= 0) {
-        std::cerr << "Error: File is empty: " << filename << std::endl;
-        throw(errno);
-    }
-
-    // Allocate a buffer to hold the file content
-    std::string contents(size, '\0');
-
-    // Seek back to the beginning and read the file content
-    in.seekg(0, std::ios::beg);
-    if (!in.read(&contents[0], size)) {
-        std::cerr << "Error reading file: " << filename << std::endl;
-        throw(errno);
-    }
-
-    // Close the file
-    in.close();
-
-    std::cout << "Successfully read file: " << filename << ", Size: " << size << " bytes" << std::endl;
-
-    return contents;
+    throw(errno);
 }
-
 
 Shader::Shader(const char* vertexFile, const char* fragmentFile) {
     std::string vertexCode = get_file_contents(vertexFile);
