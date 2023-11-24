@@ -72,6 +72,9 @@ int main() {
     VBO1.Unbind();
     EBO1.Unbind();
 
+    // Set the OpenGL viewport
+    glViewport(0, 0, 800, 800);  // Adjust based on your window dimensions
+
     // Main loop
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
