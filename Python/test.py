@@ -1,153 +1,239 @@
 import pygame
 import numpy as np
+from math import *
+import sys
+from Cube import Cube
+from Triangle import Triangle
+from Pyramid import Pyramid
+from Sphere import Sphere
+from HexPrism import HexPrism
+from ColorsAndText import ColorsAndText
+from Physics import Physics
 
 pygame.init()
 
-WIDTH, HEIGHT = 1400, 800
-pygame.display.set_caption("Graph")
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-font = pygame.font.Font(None, 36)
+paused = False
+forward = False
+triangle = False
+pyramid = False
+cube = True
+hexPrism = False
+sphere = False
+moveUp = False
+moveDown = False
+moveLeft = False
+moveRight = False
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE = (50, 120, 255)
-points = []
+WIDTH, HEIGHT = 1440, 845
+pygame.display.set_caption("3d Renderer")
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+scale = 96
+circle_pos = [WIDTH / 2, HEIGHT / 2]
+angle = 0
+xAngle = 0
+yAngle = 0
+angleAddition = 0.01
+wall_thickness = 10
+gravity = 0.5
+bounceStop = 0.3
+viewing_angle = 0
+
+# For Cube
+Cube = Cube()
+Cube.appendCubePoints()
+
+# For Triangle
+Triangle = Triangle()
+Triangle.appendTrianglePoints()
+
+# For Pyramid
+Pyramid = Pyramid()
+Pyramid.appendPyramidPoints()
+
+#For Hexagon Prism
+HexPrism = HexPrism()
+HexPrism.appendHexPrismPoints()
+#For Sp65555555here
+Sphere = Sphere()
+Sphere.appendSpherePoints()
+
+#For the colors and the texts displayed
+ColorsAndText = ColorsAndText()
+ColorsAndText.addColors()
+
+#For the physics
+# physics = Physics()
+
+projection_matrix = np.matrix([
+    [1, 0, 0],
+    [0, 1, 0]
+])
 
 def connectPoints(i, j, points):
-    x1, y1 = points[i]
-    x2, y2 = points[j]
-
-    # Draw the line within the screen
-    pygame.draw.line(screen, BLUE, (x1, y1), (x2, y2), 3)
-
-    # Calculate the slope and y-intercept
-    m = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
-    b = y1 - m * x1
-
-    # Calculate the extended line points
-    extended_x1 = -WIDTH
-    extended_y1 = m * extended_x1 + b
-    extended_x2 = 2 * WIDTH
-    extended_y2 = m * extended_x2 + b
-
-    # Draw the extended line
-    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
+    pygame.draw.line(screen, ColorsAndText.shapeColor, (points[i][0], points[i][1]), (points[j][0], points[j][1]))
 
 
-    # Draw the extended line
-    pygame.draw.line(screen, BLUE, (extended_x1, extended_y1), (extended_x2, extended_y2), 3)
+def checkShapes(change, object1, object2, object3, object4):
+    if object1:
+        object1 = not object1
+    elif object2: 
+        object2 = not object2
+    elif object3:
+        object3 = not object3
+    elif object4:
+        object4 = not object4
 
-def drawGrid():
-    pygame.draw.circle(screen, WHITE, (WIDTH // 2, HEIGHT // 2), 5)
-    x = 0  
-    y = 0 
-    for i in range((1400 // 50) + 1):  
-        x += 50  
-        pygame.draw.line(screen, WHITE, (x, 0), (x, HEIGHT))
-    for i in range((800 // 50) + 1):
-        y += 50
-        pygame.draw.line(screen, WHITE, (0, y), (WIDTH, y))
+    change = not change
 
-def wrap_text(text, font, max_width):
-    lines = []
-    words = text.split()
-    current_line = words[0]
+    return change, object1, object2, object3, object4
 
-    for word in words[1:]:
-        test_line = current_line + " " + word
-        test_width, _ = font.size(test_line)
-        if test_width <= max_width:
-            current_line = test_line
+
+def movement(shape_instance):
+    points = shape_instance.cubePoints
+    projectedPoints = shape_instance.cubeProjectedPoints
+    i = 0
+
+    # Making dots at updated/rotated points
+    for point in points:
+        rotated2D = np.dot(rotationZ, point.reshape((3, 1)))
+        rotated2D = np.dot(rotationX, rotated2D)
+        rotated2D = np.dot(rotationY, rotated2D)
+
+        projected2D = np.dot(projection_matrix, rotated2D)
+
+        x = int(projected2D[0, 0] * scale) + circle_pos[0]
+        y = int(projected2D[1, 0] * scale) + circle_pos[1]
+
+        if i >= len(projectedPoints):
+            projectedPoints.append([x, y])
         else:
-            lines.append(current_line)
-            current_line = word
+            projectedPoints[i] = [x, y]
+        pygame.draw.circle(screen, shape_instance.color, (x, y), 5)
+        i += 1
 
-    lines.append(current_line)
-    return lines
-
-def inputText(display_text, initial_value=""):
-    input_window = pygame.display.set_mode((1400, 800))
-    pygame.display.set_caption("Text Input")
-    user_text = initial_value
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    return user_text
-                elif event.key == pygame.K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
-
-        input_window.fill(BLACK)  # Clear the window each frame
-
-        # Wrap the text to a new line if it exceeds the width
-        wrapped_lines = wrap_text(display_text + user_text, font, WIDTH - 20)
-
-        # Draw the wrapped lines
-        for i, line in enumerate(wrapped_lines):
-            text_surface = font.render(line, True, WHITE)
-            input_window.blit(text_surface, (10, 10 + i * font.get_linesize()))
-
-        pygame.display.flip()
-
-def findPoints():
-    print("Use the line equation y = mx + b")
-    neg_choice = int(inputText("If m is a negative number press 1. Otherwise click any other number: \n"))
-    mNum = int(inputText("What is m's numerator: \n"))
-    mDen = int(inputText("What is m's denominator: \n"))
-    bAns = int(inputText("What is b: \n"))
-    bP = 0
-    mDenP1 = 0
-    mDenP2 = 0
-    mDenP3 = 0
-    mDenP4 = 0
-    for i in range(bAns):
-        bP += 50
-    mNumP1 = HEIGHT/2 - bP
-    mNumP2 = HEIGHT/2 - bP
-    mNumP3 = HEIGHT/2 - bP
-    mNumP4 = HEIGHT/2 - bP
-    points.append((WIDTH/2, HEIGHT/2 - bP))
-    for i in range(mNum):
-        mNumP1 -= 50
-        mNumP2 += 50
-        mNumP3 -= 50  # Corrected
-        mNumP4 += 50  # Corrected
-    for i in range(mDen):
-        mDenP1 += 50
-        mDenP2 -= 50
-        mDenP3 += 50  # Corrected
-        mDenP4 -= 50  # Corrected
-    points.append((WIDTH/2 + mDenP1, mNumP1))
-    points.append((WIDTH/2 + mDenP2, mNumP2))
-    points.append((WIDTH/2 + mDenP3, mNumP3))
-    points.append((WIDTH/2 + mDenP4, mNumP4))
+    # Connecting the points
+    shape_instance.connectCubePoints(screen, projectedPoints, connectPoints)
 
 
-running = True
-findPoints()
-while running:
+clock = pygame.time.Clock()
+
+while True:
+
+    clock.tick(60)
     for event in pygame.event.get():
+        #Checking what key is pressed and then executing specific action
         if event.type == pygame.QUIT:
-            running = False
+            pygame.quit()
+            exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                running = False
+                pygame.quit()
+                exit()
+            if event.key == pygame.K_SPACE: paused = not paused
+            if event.key == pygame.K_r: forward = not forward
+            if event.key == pygame.K_UP: scale += 96
+            if event.key == pygame.K_DOWN: scale -= 96
+            if event.key == pygame.K_c: cube, pyramid, triangle, hexPrism, sphere = checkShapes(cube, pyramid, triangle, hexPrism, sphere)
+            if event.key == pygame.K_p: pyramid, cube, triangle, hexPrism, sphere = checkShapes(pyramid, cube, triangle, hexPrism, sphere)
+            if event.key == pygame.K_t: triangle, pyramid, cube, hexPrism, sphere = checkShapes(triangle, pyramid, cube, hexPrism, sphere)
+            if event.key == pygame.K_h: hexPrism, pyramid, cube, triangle, sphere = checkShapes(hexPrism, pyramid, cube, triangle, sphere)
+            if event.key == pygame.K_l: sphere, pyramid, cube, triangle, hexPrism = checkShapes(sphere, pyramid, cube, triangle, hexPrism)
+            if event.key == pygame.K_f: angleAddition += 0.01
+            if event.key == pygame.K_b: angleAddition -= 0.01
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Check if left mouse button is clicked
+                ColorsAndText.x, ColorsAndText.y = pygame.mouse.get_pos()
+                ColorsAndText.changeColors()
+                if ColorsAndText.x > 100 and (ColorsAndText.x < 1000 and ColorsAndText.y > 35):
+                    circle_pos = [ColorsAndText.x, ColorsAndText.y]
+                    
+    keys = pygame.key.get_pressed()
 
-    screen.fill(BLACK)
-    drawGrid()
-    pygame.draw.circle(screen, BLUE, (int(points[0][0]), int(points[0][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[1][0]), int(points[1][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[2][0]), int(points[2][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[3][0]), int(points[3][1])), 8)
-    pygame.draw.circle(screen, BLUE, (int(points[4][0]), int(points[4][1])), 8)
-    connectPoints(3, 4, points)
-    pygame.display.flip()
+    keys = pygame.key.get_pressed()
 
+    if keys[pygame.K_w]:
+        yAngle += angleAddition
+    if keys[pygame.K_s]:
+        yAngle -= angleAddition
+    if keys[pygame.K_d]:
+        xAngle += angleAddition
+    if keys[pygame.K_a]:
+        xAngle -= angleAddition
 
-pygame.quit()
+    # update rotation matrices based on angles
+    rotationZ = np.matrix([
+        [cos(viewing_angle), -sin(viewing_angle), 0],
+        [sin(viewing_angle), cos(viewing_angle), 0],
+        [0, 0, 1]
+    ])
+
+    rotationY = np.matrix([
+        [cos(xAngle), 0, sin(xAngle)],
+        [0, 1, 0],
+        [-sin(xAngle), 0, cos(xAngle)]
+    ])
+
+    rotationX = np.matrix([
+        [1, 0, 0],
+        [0, cos(yAngle), -sin(yAngle)],
+        [0, sin(yAngle), cos(yAngle)]
+    ])
+    
+    if not paused:
+        
+        if ColorsAndText.falling:
+            #Need to move object down
+            circle_pos[1] += 5
+        # update shape rotations
+        # rotationZ = np.matrix([
+        #     [cos(viewing_angle), -sin(viewing_angle), 0],
+        #     [sin(viewing_angle), cos(viewing_angle), 0],
+        #     [0, 0, 1]
+        # ])
+        # rotationY = np.matrix([
+        #     [cos(xAngle), 0, sin(xAngle)],
+        #     [0, 1, 0],
+        #     [-sin(xAngle), 0, cos(xAngle)]
+        # ])
+        # rotationX = np.matrix([
+        #     [1, 0, 0],
+        #     [0, cos(yAngle), -sin(yAngle)],
+        #     [0, sin(yAngle), cos(yAngle)]
+        # ])
+
+        #if forward:
+        #    angle += angleAddition
+        #else:
+        #    angle -= angleAddition
+
+        screen.fill(ColorsAndText.backgroundColor)
+        #Finding out which shape I want to display and displaying it
+        if cube:
+            movement(Cube)
+        elif triangle:
+            movement(Triangle)
+        elif pyramid:
+            movement(Pyramid)
+        elif hexPrism:
+            movement(HexPrism)
+        elif sphere:
+            movement(Sphere)
+
+    place = 20
+    for i in range(2):
+        if i == 0:
+            header = ColorsAndText.header1
+        else:
+            header = ColorsAndText.header2
+            
+        screen.blit(header, (20, place))
+        place += 35
+        
+        for j in range(1, len(ColorsAndText.texts)):
+            screen.blit(ColorsAndText.texts[j], (20, place))
+            place += 35
+        place += 40
+    screen.blit(ColorsAndText.runButton, (WIDTH-55, 10))
+
+    pygame.display.update()

@@ -48,26 +48,25 @@ class ColorsAndText:
         self.texts.append(color10)
 
         self.header2 = self.smallfont.render('Shape Color', True, self.buttonText)
-        backgroundColor = self.BLACK
-        shapeColor = self.WHITE
 
     def changeColors(self):
-        WIDTH, HEIGHT = 1440, 845
-        if 20 <= self.x <= 100:
-            if 60 <= self.y <= 80:
-                # Black
-                self.backgroundColor = self.BLACK
-            elif 100 <= self.y <= 115:
-                # White
-                self.backgroundColor = self.WHITE
-            # ... (continue for other colors)
-            elif 805 <= self.y <= 820:
-                # Purple
-                self.backgroundColor = self.PURPLE
-        elif 1440 - 55 <= self.x <= 1440:
-            if 10 <= self.y <= 30:
-                self.falling = not self.falling
-                if self.falling:
-                    print("Falling")
-                else:
-                    print("No")
+        print(self.x, self.y)
+        if 20 <= self.x <= 100 and self.y < 845 / 2:
+            category = "Background Color"
+        elif 20 <= self.x <= 100 and self.y > 845 / 2:
+            category = "Shape Color"
+        else:
+            return  # Ignore clicks outside color categories
+
+        color_index = (self.y - 60) // 35  # Calculate color index based on y-coordinate
+
+        if category == "Background Color":
+            if 0 <= color_index < len(self.texts):
+                self.backgroundColor = self.getColorByIndex(color_index)
+        elif category == "Shape Color":
+            if 0 <= color_index < len(self.texts):
+                self.shapeColor = self.getColorByIndex(color_index)
+
+    def getColorByIndex(self, index):
+        colors = [self.BLACK, self.WHITE, self.BLUE, self.RED, self.GREEN, self.GREY, self.PINK, self.CYAN, self.ORANGE, self.PURPLE]
+        return colors[index]
