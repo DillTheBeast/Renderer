@@ -1,12 +1,39 @@
 import pygame
-import sys
+from pygame.locals import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+import glm
 import math
+import numpy
+import ctypes
 
-# Initialize Pygame
+# Load 3D model (replace 'your_model.obj' with the path to your model file)
+model_path = 'sushi.obj'
+model_vertices = []
+model_faces = []
+
+# Scaling factor to make the model smaller
+scale_factor = 0.5  # You can adjust this value based on how much you want to scale the model
+
+with open(model_path, 'r', encoding='latin-1') as file:
+    for line in file:
+        if line.startswith('v '):
+            vertices = line.split()[1:]
+            model_vertices.append([float(v) for v in vertices])
+        elif line.startswith('f '):
+            faces = line.split()[1:]
+            model_faces.append([int(f.split('/')[0]) - 1 for f in faces])
+
+# Apply scaling to the entire model
+scaled_model_vertices = [[v[0] * scale_factor, v[1] * scale_factor, v[2] * scale_factor] for v in model_vertices]
+
+WIDTH, HEIGHT = 800, 600
+
 pygame.init()
+pygame.display.set_mode((WIDTH, HEIGHT), DOUBLEBUF | OPENGL | pygame.OPENGL_COMPATBLT)
+
 
 # Constants
-WIDTH, HEIGHT = 800, 600
 FPS = 60
 
 # Colors
@@ -14,42 +41,41 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # Create the screen
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Simple 3D Renderer")
+screen = pygame.display.set_mode((WIDTH, HEIGHT), DOUBLEBUF | OPENGL)
+pygame.display.set_caption("Simple 3D Model Viewer")
 clock = pygame.time.Clock()
 
-scale = 0.5
-
-# Define a cube with three coordinates for each vertex
-vertices = [
-    [-1 * scale, -1 * scale, -1 * scale],
-    [-1 * scale, 1 * scale, -1 * scale],
-    [1 * scale, 1 * scale, -1 * scale],
-    [1 * scale, -1 * scale, -1 * scale],
-    [-1 * scale, -1 * scale, 1 * scale],
-    [-1 * scale, 1 * scale, 1 * scale],
-    [1 * scale, 1 * scale, 1 * scale],
-    [1 * scale, -1 * scale, 1 * scale]
-]
-
-# Define edges of the cube
-edges = [
-    (0, 1), (1, 2), (2, 3), (3, 0),
-    (4, 5), (5, 6), (6, 7), (7, 4),
-    (0, 4), (1, 5), (2, 6), (3, 7)
-]
-
 # Camera parameters
-camera_pos = [0, 0, -5]  # Initial camera position
+camera_pos = glm.vec3(0, 0, 5)  # Initial camera position
 yaw = 0  # Yaw angle (rotation around the y-axis)
 pitch = 0  # Pitch angle (rotation around the x-axis)
+
+# OpenGL setup
+glEnable(GL_DEPTH_TEST)
+glEnable(GL_CULL_FACE)
+
+# Perspective setup
+glMatrixMode(GL_PROJECTION)
+gluPerspective(45, (WIDTH / HEIGHT), 0.1, 100.0)
+glMatrixMode(GL_MODELVIEW)
+glTranslatef(0.0, 0.0, -5)
+
+# After loading the model, create VBO and VAO
+vbo = glGenBuffers(1)
+glBindBuffer(GL_ARRAY_BUFFER, vbo)
+glBufferData(GL_ARRAY_BUFFER, numpy.array(scaled_model_vertices, dtype='float32'), GL_STATIC_DRAW)
+
+vao = glGenVertexArrays(1)
+glBindVertexArray(vao)
+glEnableVertexAttribArray(0)
+glVertexAttribPointer(0, 3, GL_FLOAT, False, 0, ctypes.c_void_p(0))
 
 # Main game loop
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
+            quit()
 
     # Handle camera movement and rotation
     keys = pygame.key.get_pressed()
@@ -57,14 +83,14 @@ while True:
     rotation_speed = 0.02
 
     if keys[pygame.K_w]:
-        camera_pos[2] -= speed * math.cos(yaw)
-        camera_pos[0] += speed * math.sin(yaw)
-        camera_pos[1] += speed * math.sin(pitch)
+        camera_pos.z -= speed * glm.cos(yaw)
+        camera_pos.x += speed * glm.sin(yaw)
+        camera_pos.y += speed * glm.sin(pitch)
 
     if keys[pygame.K_s]:
-        camera_pos[2] += speed * math.cos(yaw)
-        camera_pos[0] -= speed * math.sin(yaw)
-        camera_pos[1] -= speed * math.sin(pitch)
+        camera_pos.z += speed * glm.cos(yaw)
+        camera_pos.x -= speed * glm.sin(yaw)
+        camera_pos.y -= speed * glm.sin(pitch)
 
     if keys[pygame.K_a]:
         yaw += rotation_speed
@@ -73,10 +99,10 @@ while True:
         yaw -= rotation_speed
 
     if keys[pygame.K_q]:
-        camera_pos[1] -= speed
+        camera_pos.y -= speed
 
     if keys[pygame.K_e]:
-        camera_pos[1] += speed
+        camera_pos.y += speed
 
     if keys[pygame.K_UP]:
         pitch += rotation_speed
@@ -87,71 +113,20 @@ while True:
     pitch = max(-math.pi / 2, min(math.pi / 2, pitch))
 
     # Clear the screen
-    screen.fill(BLACK)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    # Define the view matrix (camera transformation)
-    view_matrix = [
-        [math.cos(yaw), math.sin(pitch) * math.sin(yaw), -math.cos(pitch) * math.sin(yaw), camera_pos[0]],
-        [0, math.cos(pitch), math.sin(pitch), camera_pos[1]],
-        [math.sin(yaw), -math.sin(pitch) * math.cos(yaw), math.cos(pitch) * math.cos(yaw), camera_pos[2]],
-        [0, 0, 0, 1]
-    ]
+    # Load the identity matrix to reset transformations
+    glLoadIdentity()
 
-    # Define the perspective projection matrix
-    fov = 500
-    projection_matrix = [
-        [2 * fov / WIDTH, 0, 0, 0],
-        [0, -2 * fov / HEIGHT, 0, 0],
-        [0, 0, -1, 0]
-    ]
+    # Apply camera transformations
+    gluLookAt(camera_pos.x, camera_pos.y, camera_pos.z,
+              camera_pos.x + glm.sin(yaw), camera_pos.y + glm.sin(pitch), camera_pos.z - glm.cos(yaw),
+              0, 1, 0)
 
-    # Project and draw the cube
-    for edge in edges:
-        start = vertices[edge[0]]
-        end = vertices[edge[1]]
-
-        # Apply view matrix
-        start_view = [
-            start[0] * view_matrix[0][0] + start[1] * view_matrix[0][1] + start[2] * view_matrix[0][2] + view_matrix[0][3],
-            start[0] * view_matrix[1][0] + start[1] * view_matrix[1][1] + start[2] * view_matrix[1][2] + view_matrix[1][3],
-            start[0] * view_matrix[2][0] + start[1] * view_matrix[2][1] + start[2] * view_matrix[2][2] + view_matrix[2][3]
-        ]
-        end_view = [
-            end[0] * view_matrix[0][0] + end[1] * view_matrix[0][1] + end[2] * view_matrix[0][2] + view_matrix[0][3],
-            end[0] * view_matrix[1][0] + end[1] * view_matrix[1][1] + end[2] * view_matrix[1][2] + view_matrix[1][3],
-            end[0] * view_matrix[2][0] + end[1] * view_matrix[2][1] + end[2] * view_matrix[2][2] + view_matrix[2][3]
-        ]
-
-        # Apply perspective projection
-        start_projected = [
-            start_view[0] * projection_matrix[0][0] + start_view[1] * projection_matrix[0][1] + start_view[2] * projection_matrix[0][2] + projection_matrix[0][3],
-            start_view[0] * projection_matrix[1][0] + start_view[1] * projection_matrix[1][1] + start_view[2] * projection_matrix[1][2] + projection_matrix[1][3],
-            start_view[0] * projection_matrix[2][0] + start_view[1] * projection_matrix[2][1] + start_view[2] * projection_matrix[2][2] + projection_matrix[2][3]
-        ]
-        end_projected = [
-            end_view[0] * projection_matrix[0][0] + end_view[1] * projection_matrix[0][1] + end_view[2] * projection_matrix[0][2] + projection_matrix[0][3],
-            end_view[0] * projection_matrix[1][0] + end_view[1] * projection_matrix[1][1] + end_view[2] * projection_matrix[1][2] + projection_matrix[1][3],
-            end_view[0] * projection_matrix[2][0] + end_view[1] * projection_matrix[2][1] + end_view[2] * projection_matrix[2][2] + projection_matrix[2][3]
-        ]
-
-        # Perspective divide
-        start_projected = [start_projected[0] / start_projected[2], start_projected[1] / start_projected[2]]
-        end_projected = [end_projected[0] / end_projected[2], end_projected[1] / end_projected[2]]
-
-        # Scale and translate
-        start_screen = (
-            int(start_projected[0] * WIDTH / 2 + WIDTH / 2),
-            int(-start_projected[1] * HEIGHT / 2 + HEIGHT / 2)
-        )
-        end_screen = (
-            int(end_projected[0] * WIDTH / 2 + WIDTH / 2),
-            int(-end_projected[1] * HEIGHT / 2 + HEIGHT / 2)
-        )
-        # Print camera position for debugging
-        print("Camera Position:", camera_pos)
-
-        # Draw the line
-        pygame.draw.line(screen, WHITE, start_screen, end_screen, 2)
+    # Draw the 3D model
+    glBindVertexArray(vao)
+    glDrawArrays(GL_TRIANGLES, 0, len(scaled_model_vertices))
+    glBindVertexArray(0)
 
     # Update the display
     pygame.display.flip()
