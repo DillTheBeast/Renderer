@@ -28,7 +28,7 @@ public class Render {
                     g2.fillRect(0, 0, getWidth(), getHeight());
 
                     List<Triangle> tris = new ArrayList<>();
-                    tris.add(new Triangle(new Vertex(300, 100, 100),
+                    tris.add(new Triangle(new Vertex(100, 100, 100),
                                           new Vertex(-100, -100, 100),
                                           new Vertex(-100, 100, -100),
                                           Color.WHITE));
