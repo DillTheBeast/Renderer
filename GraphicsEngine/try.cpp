@@ -33,7 +33,7 @@ void display() {
     glTranslatef(-1.5f, 0.0f, -6.0f);
     glRotatef(angle, 0.0f, 1.0f, 0.0f);  // Rotate around the (0,1,0) axis
 
-    glutSolidTeapot(1.5f);  // Draw a solid teapot
+    glutWireDodecahedron();  // Draw a solid teapot
 
     glutSwapBuffers();
 }
