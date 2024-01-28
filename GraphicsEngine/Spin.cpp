@@ -1,3 +1,4 @@
+//g++ -o GraphicsEngine Spin.cpp -std=c++11 -I/opt/homebrew/Cellar/glfw/3.3.9/include -I/opt/homebrew/Cellar/glew/2.2.0_1/include -I/opt/homebrew/Cellar/glm/0.9.9.8/include -I/opt/homebrew/Cellar/freeglut/3.4.0/include -L/opt/homebrew/Cellar/glfw/3.3.9/lib -L/opt/homebrew/Cellar/glew/2.2.0_1/lib -L/opt/homebrew/Cellar/freeglut/3.4.0/lib -lglfw -lGLEW -lglut -framework OpenGL
 #define GL_SILENCE_DEPRECATION
 #include <GL/glut.h>
 
@@ -33,7 +34,7 @@ void display() {
     glTranslatef(-1.5f, 0.0f, -6.0f);
     glRotatef(angle, 0.0f, 1.0f, 0.0f);  // Rotate around the (0,1,0) axis
 
-    glutWireDodecahedron();  // Draw a solid teapot
+    glutSolidTeapot(1.5f);  // Draw a solid teapot
 
     glutSwapBuffers();
 }
