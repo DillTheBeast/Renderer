@@ -26,19 +26,22 @@ void display() {
     glLoadIdentity();
     glTranslatef(1.5f, 0.0f, -7.0f);
     glRotatef(angle, 1.0f, 1.0f, 1.0f);  // Rotate around the (1,1,1) axis
-
     glutSolidCube(2.0f);  // Draw a solid cube
 
-    // Draw the second 3D object (a rotating teapot)
+    // Draw the second 3D object (a rotating teapot) with the set material
     glLoadIdentity();
     glTranslatef(-1.5f, 0.0f, -6.0f);
-    glRotatef(angle, 0.0f, 1.0f, 0.0f);  // Rotate around the (0,1,0) axis
+    glRotatef(angle, 0.0f, 1.0f, 0.0f);
 
+    // Set the color for the teapot (orange)
+    glColor3f(1.0f, 0.5f, 0.0f);
     glutSolidTeapot(1.5f);  // Draw a solid teapot
+
+    // Reset color to default (white)
+    glColor3f(1.0f, 1.0f, 1.0f);
 
     glutSwapBuffers();
 }
-
 /* Handler for window re-size event */
 void reshape(GLsizei width, GLsizei height) {
     if (height == 0) height = 1;
