@@ -1,5 +1,6 @@
 #define GL_SILENCE_DEPRECATION
 #include <GL/glut.h>
+#include <GL/glu.h>
 
 /* Global variables */
 char title[] = "Connected Wireframe Person";
@@ -35,25 +36,25 @@ void display() {
     glLoadIdentity();
     glTranslatef(1.5f, 0.5f, -6.0f);
     glRotatef(45.0f, 0.0f, 0.0f, 1.0f);  // Rotate around the z-axis
-    glutWireCylinder(0.25f, 2.0f, 16, 1);  // Draw a wireframe cylinder
+    gluCylinder(gluNewQuadric(), 0.25f, 0.25f, 2.0f, 16, 1);  // Draw a wireframe cylinder
 
     // Draw the left arm
     glLoadIdentity();
     glTranslatef(-1.5f, 0.5f, -6.0f);
     glRotatef(-45.0f, 0.0f, 0.0f, 1.0f);  // Rotate around the z-axis
-    glutWireCylinder(0.25f, 2.0f, 16, 1);  // Draw a wireframe cylinder
+    gluCylinder(gluNewQuadric(), 0.25f, 0.25f, 2.0f, 16, 1);  // Draw a wireframe cylinder
 
     // Draw the right leg
     glLoadIdentity();
     glTranslatef(0.75f, -3.0f, -6.0f);
     glRotatef(30.0f, 0.0f, 0.0f, 1.0f);  // Rotate around the z-axis
-    glutWireCylinder(0.25f, 3.0f, 16, 1);  // Draw a wireframe cylinder
+    gluCylinder(gluNewQuadric(), 0.25f, 0.25f, 3.0f, 16, 1);  // Draw a wireframe cylinder
 
     // Draw the left leg
     glLoadIdentity();
     glTranslatef(-0.75f, -3.0f, -6.0f);
     glRotatef(-30.0f, 0.0f, 0.0f, 1.0f);  // Rotate around the z-axis
-    glutWireCylinder(0.25f, 3.0f, 16, 1);  // Draw a wireframe cylinder
+    gluCylinder(gluNewQuadric(), 0.25f, 0.25f, 3.0f, 16, 1);  // Draw a wireframe cylinder
 
     glutSwapBuffers();
 }
