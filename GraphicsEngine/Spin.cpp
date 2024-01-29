@@ -5,7 +5,8 @@
 /* Global variables */
 char title[] = "Spinning 3D Objects";
 float angle = 0.0f;
-float spinSpeed = 1.0f;  // Adjust this variable to control rotation speed
+float spinSpeed = 1.0f;  // Initial rotation speed
+float acceleration = 0.1f;  // Speed acceleration factor
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -15,6 +16,9 @@ void initGL() {
     glDepthFunc(GL_LEQUAL);                 // Set the type of depth-test
     glShadeModel(GL_SMOOTH);                // Enable smooth shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
+
+    // Set up material properties for the teapot
+    glutSetColor(0, 1.0f, 0.5f, 0.0f);  // Set the color to orange
 }
 
 /* Handler for window-repaint event */
@@ -42,7 +46,26 @@ void display() {
 
     glutSwapBuffers();
 }
-/* Handler for window re-size event */
+
+/* Timer function for animation */
+void timer(int value) {
+    angle += spinSpeed;  // Increment the rotation angle
+    glutPostRedisplay(); // Request a redraw to update the display
+    glutTimerFunc(16, timer, 0);  // Set up the next timer callback for 60 frames per second
+}
+
+/* Keyboard callback function */
+void keyboard(unsigned char key, int x, int y) {
+    if (key == 'w') {
+        // Increase rotation speed when 'w' key is pressed
+        spinSpeed += acceleration;
+    }
+    else if (key == 's') {
+        spinSpeed -= acceleration;
+    }
+}
+
+/* Reshape function for window resizing */
 void reshape(GLsizei width, GLsizei height) {
     if (height == 0) height = 1;
     GLfloat aspect = (GLfloat)width / (GLfloat)height;
@@ -53,13 +76,6 @@ void reshape(GLsizei width, GLsizei height) {
     gluPerspective(45.0f, aspect, 0.1f, 100.0f);
 }
 
-/* Timer function for animation */
-void timer(int value) {
-    angle += spinSpeed;  // Increment the rotation angle
-    glutPostRedisplay(); // Request a redraw to update the display
-    glutTimerFunc(16, timer, 0);  // Set up the next timer callback for 60 frames per second
-}
-
 /* Main function */
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -68,11 +84,14 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(50, 50);
     glutCreateWindow(title);
 
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
+    // Call the initialization function
     initGL();
 
+    // Register callback functions
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
     glutTimerFunc(0, timer, 0);  // Start the timer for animation
+    glutKeyboardFunc(keyboard);
 
     glutMainLoop();
     return 0;
