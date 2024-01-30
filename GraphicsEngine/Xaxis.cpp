@@ -1,12 +1,16 @@
-//g++ -o GraphicsEngine Spin.cpp -std=c++11 -I/opt/homebrew/Cellar/glfw/3.3.9/include -I/opt/homebrew/Cellar/glew/2.2.0_1/include -I/opt/homebrew/Cellar/glm/0.9.9.8/include -I/opt/homebrew/Cellar/freeglut/3.4.0/include -L/opt/homebrew/Cellar/glfw/3.3.9/lib -L/opt/homebrew/Cellar/glew/2.2.0_1/lib -L/opt/homebrew/Cellar/freeglut/3.4.0/lib -lglfw -lGLEW -lglut -framework OpenGL
+//g++ -o GraphicsEngine Xaxis.cpp -std=c++11 -I/opt/homebrew/Cellar/glfw/3.3.9/include -I/opt/homebrew/Cellar/glew/2.2.0_1/include -I/opt/homebrew/Cellar/glm/0.9.9.8/include -I/opt/homebrew/Cellar/freeglut/3.4.0/include -L/opt/homebrew/Cellar/glfw/3.3.9/lib -L/opt/homebrew/Cellar/glew/2.2.0_1/lib -L/opt/homebrew/Cellar/freeglut/3.4.0/lib -lglfw -lGLEW -lglut -framework OpenGL
 #define GL_SILENCE_DEPRECATION
 #include <GL/glut.h>
+#include <cmath>
 
 /* Global variables */
-char title[] = "Spinning 3D Objects";
+char title[] = "Camera Moving Around X-Axis";
 float angle = 0.0f;
 float spinSpeed = 1.0f;  // Initial rotation speed
 float acceleration = 0.1f;  // Speed acceleration factor
+
+float cameraX = 0.0f;  // Initial camera position on the x-axis
+float cameraSpeed = 0.1f;  // Initial camera movement speed
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -26,14 +30,26 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear color and depth buffers
     glMatrixMode(GL_MODELVIEW);
 
-    // Draw the first 3D object (a rotating cube)
+    // Set up camera position
     glLoadIdentity();
+    gluLookAt(cameraX, 0.0f, 5.0f,  // Camera position
+              cameraX, 0.0f, -1.0f, // Look at point
+              0.0f, 1.0f, 0.0f);     // Up vector
+
+    // Draw the first 3D object (a rotating cube)
+    glPushMatrix();  // Save the current modelview matrix
     glTranslatef(1.5f, 0.0f, -7.0f);
-    glRotatef(angle, 1.0f, 1.0f, 1.0f);  // Rotate around the (1,1,1) axis
+    // Remove the rotation transformation for the cube
+    // glRotatef(angle, 1.0f, 1.0f, 1.0f);  // Rotate around the (1,1,1) axis
     glutSolidCube(2.0f);  // Draw a solid cube
+    glPopMatrix();  // Restore the previous modelview matrix
 
     // Draw the second 3D object (a rotating teapot) with the set material
     glLoadIdentity();
+    gluLookAt(cameraX, 0.0f, 5.0f,  // Camera position
+              cameraX, 0.0f, -1.0f, // Look at point
+              0.0f, 1.0f, 0.0f);     // Up vector
+
     glTranslatef(-1.5f, 0.0f, -6.0f);
     glRotatef(angle, 0.0f, 1.0f, 0.0f);
 
@@ -46,6 +62,7 @@ void display() {
 
     glutSwapBuffers();
 }
+
 
 /* Timer function for animation */
 void timer(int value) {
@@ -62,6 +79,14 @@ void keyboard(unsigned char key, int x, int y) {
     }
     else if (key == 's') {
         spinSpeed -= acceleration;
+    }
+    else if (key == 'a') {
+        // Move the camera left along the x-axis
+        cameraX -= cameraSpeed;
+    }
+    else if (key == 'd') {
+        // Move the camera right along the x-axis
+        cameraX += cameraSpeed;
     }
 }
 
@@ -90,7 +115,7 @@ int main(int argc, char** argv) {
     // Register callback functions
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    //glutTimerFunc(0, timer, 0);  // Start the timer for animation
+    glutTimerFunc(0, timer, 0);  // Start the timer for animation
     glutKeyboardFunc(keyboard);
 
     glutMainLoop();
