@@ -4,13 +4,14 @@
 #include <cmath>
 
 /* Global variables */
-char title[] = "Camera Moving Around X-Axis";
+char title[] = "Camera Moving and Rotating Around Object";
 float angle = 0.0f;
 float spinSpeed = 1.0f;  // Initial rotation speed
 float acceleration = 0.1f;  // Speed acceleration factor
 
-float cameraX = 0.0f;  // Initial camera position on the x-axis
-float cameraSpeed = 0.1f;  // Initial camera movement speed
+float cameraRadius = 5.0f;  // Initial distance from the object
+float cameraAngle = 0.0f;   // Initial camera rotation angle
+float cameraSpeed = 0.05f;  // Initial camera rotation speed
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -30,25 +31,26 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear color and depth buffers
     glMatrixMode(GL_MODELVIEW);
 
+    // Calculate camera position in circular motion around the object
+    float cameraX = cameraRadius * sin(cameraAngle);
+    float cameraZ = cameraRadius * cos(cameraAngle);
+
     // Set up camera position
-    glLoadIdentity();
-    gluLookAt(cameraX, 0.0f, 5.0f,  // Camera position
-              cameraX, 0.0f, -1.0f, // Look at point
-              0.0f, 1.0f, 0.0f);     // Up vector
+    gluLookAt(cameraX, 0.0f, cameraZ,      // Camera position
+              0.0f, 0.0f, 0.0f,            // Look at point (object position)
+              0.0f, 1.0f, 0.0f);           // Up vector
 
     // Draw the first 3D object (a rotating cube)
     glPushMatrix();  // Save the current modelview matrix
     glTranslatef(1.5f, 0.0f, -7.0f);
-    // Remove the rotation transformation for the cube
-    // glRotatef(angle, 1.0f, 1.0f, 1.0f);  // Rotate around the (1,1,1) axis
     glutSolidCube(2.0f);  // Draw a solid cube
     glPopMatrix();  // Restore the previous modelview matrix
 
     // Draw the second 3D object (a rotating teapot) with the set material
     glLoadIdentity();
-    gluLookAt(cameraX, 0.0f, 5.0f,  // Camera position
-              cameraX, 0.0f, -1.0f, // Look at point
-              0.0f, 1.0f, 0.0f);     // Up vector
+    gluLookAt(cameraX, 0.0f, cameraZ,      // Camera position
+              0.0f, 0.0f, 0.0f,            // Look at point (object position)
+              0.0f, 1.0f, 0.0f);           // Up vector
 
     glTranslatef(-1.5f, 0.0f, -6.0f);
     glRotatef(angle, 0.0f, 1.0f, 0.0f);
@@ -63,10 +65,10 @@ void display() {
     glutSwapBuffers();
 }
 
-
 /* Timer function for animation */
 void timer(int value) {
     angle += spinSpeed;  // Increment the rotation angle
+    cameraAngle += cameraSpeed;  // Increment the camera rotation angle
     glutPostRedisplay(); // Request a redraw to update the display
     glutTimerFunc(16, timer, 0);  // Set up the next timer callback for 60 frames per second
 }
@@ -76,17 +78,8 @@ void keyboard(unsigned char key, int x, int y) {
     if (key == 'w') {
         // Increase rotation speed when 'w' key is pressed
         spinSpeed += acceleration;
-    }
-    else if (key == 's') {
+    } else if (key == 's') {
         spinSpeed -= acceleration;
-    }
-    else if (key == 'a') {
-        // Move the camera left along the x-axis
-        cameraX -= cameraSpeed;
-    }
-    else if (key == 'd') {
-        // Move the camera right along the x-axis
-        cameraX += cameraSpeed;
     }
 }
 
