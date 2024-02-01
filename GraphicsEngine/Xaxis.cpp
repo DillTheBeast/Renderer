@@ -4,7 +4,7 @@
 #include <cmath>
 
 /* Global variables */
-char title[] = "Camera Moving and Rotating Around Object";
+char title[] = "Camera Rotating Around Object";
 float angle = 0.0f;
 float spinSpeed = 1.0f;  // Initial rotation speed
 float acceleration = 0.1f;  // Speed acceleration factor
@@ -37,7 +37,7 @@ void display() {
 
     // Set up camera position
     gluLookAt(cameraX, 0.0f, cameraZ,      // Camera position
-              0.0f, 0.0f, 0.0f,            // Look at point (object position)
+              0.0f, 0.0f, -1.0f,           // Look at point
               0.0f, 1.0f, 0.0f);           // Up vector
 
     // Draw the first 3D object (a rotating cube)
@@ -49,18 +49,11 @@ void display() {
     // Draw the second 3D object (a rotating teapot) with the set material
     glLoadIdentity();
     gluLookAt(cameraX, 0.0f, cameraZ,      // Camera position
-              0.0f, 0.0f, 0.0f,            // Look at point (object position)
+              0.0f, 0.0f, -1.0f,           // Look at point
               0.0f, 1.0f, 0.0f);           // Up vector
 
     glTranslatef(-1.5f, 0.0f, -6.0f);
-    glRotatef(angle, 0.0f, 1.0f, 0.0f);
-
-    // Set the color for the teapot (orange)
-    glColor3f(1.0f, 0.5f, 0.0f);
     glutSolidTeapot(1.5f);  // Draw a solid teapot
-
-    // Reset color to default (white)
-    glColor3f(1.0f, 1.0f, 1.0f);
 
     glutSwapBuffers();
 }

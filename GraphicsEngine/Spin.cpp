@@ -90,7 +90,8 @@ int main(int argc, char** argv) {
     // Register callback functions
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    //glutTimerFunc(0, timer, 0);  // Start the timer for animation
+    //Calls on the spinning animation
+    glutTimerFunc(0, timer, 0);  // Start the timer for animation
     glutKeyboardFunc(keyboard);
 
     glutMainLoop();
