@@ -8,6 +8,7 @@ float angle = 0.0f;
 float spinSpeed = 1.0f;  // Initial rotation speed
 float acceleration = 0.1f;  // Speed acceleration factor
 float displaySize = 1.5f;
+float cubeExtra = 0.5f
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -31,7 +32,7 @@ void display() {
     glLoadIdentity();
     glTranslatef(1.5f, 0.0f, -7.0f);
     glRotatef(angle, 1.0f, 1.0f, 1.0f);  // Rotate around the (1,1,1) axis
-    glutSolidCube(2.0f);  // Draw a solid cube
+    glutSolidCube(displaySize + cubeExtra);  // Draw a solid cube
 
     // Draw the second 3D object (a rotating teapot) with the set material
     glLoadIdentity();
