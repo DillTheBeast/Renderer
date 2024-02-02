@@ -7,6 +7,7 @@ char title[] = "Spinning 3D Objects";
 float angle = 0.0f;
 float spinSpeed = 1.0f;  // Initial rotation speed
 float acceleration = 0.1f;  // Speed acceleration factor
+float displaySize = 1.5f;
 
 /* Initialize OpenGL Graphics */
 void initGL() {
@@ -39,7 +40,7 @@ void display() {
 
     // Set the color for the teapot (orange)
     glColor3f(1.0f, 0.5f, 0.0f);
-    glutSolidTeapot(1.5f);  // Draw a solid teapot
+    glutSolidTeapot(displaySize);  // Draw a solid teapot
 
     // Reset color to default (white)
     glColor3f(1.0f, 1.0f, 1.0f);
@@ -62,6 +63,12 @@ void keyboard(unsigned char key, int x, int y) {
     }
     else if (key == 's') {
         spinSpeed -= acceleration;
+    }
+    else if (key == 'a') {
+        displaySize -= acceleration;
+    }
+    else if (key == 'd') {
+        displaySize += acceleration;
     }
 }
 
